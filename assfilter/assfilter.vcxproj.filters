@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="AssFilter.cpp" />
+    <ClCompile Include="AssPin.cpp" />
+    <ClCompile Include="AssEntry.cpp" />
+    <ClCompile Include="SubFrame.cpp" />
+    <ClCompile Include="AssFilterSettingsProps.cpp" />
+    <ClCompile Include="AssDebug.cpp" />
+    <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="registry.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SubRenderIntf.h" />
+    <ClInclude Include="AssFilter.h" />
+    <ClInclude Include="AssPin.h" />
+    <ClInclude Include="SubFrame.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="AssFilterSettings.h" />
+    <ClInclude Include="ISpecifyPropertyPages2.h" />
+    <ClInclude Include="AssFilterSettingsProps.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="AssDebug.h" />
+    <ClInclude Include="Tools.h" />
+    <ClInclude Include="registry.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AssFilter.rc" />
+  </ItemGroup>
+</Project>

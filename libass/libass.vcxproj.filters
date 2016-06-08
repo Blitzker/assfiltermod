@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{3bd95b26-4618-499b-a2fa-1e22d2e61081}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="strings.h" />
+    <ClInclude Include="unistd.h" />
+    <ClInclude Include="upstream\libass\ass.h" />
+    <ClInclude Include="dirent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="upstream\libass\ass_utils.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_shaper.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_render_api.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_render.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_rasterizer_c.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_rasterizer.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_parse.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_library.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_fontselect.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_fontconfig.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_font.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_drawing.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_cache.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_bitmap.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_strtod.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_directwrite.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_blur.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="upstream\libass\ass_string.c">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
