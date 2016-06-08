@@ -122,9 +122,6 @@ private:
 
         std::wstring FontName;
         DWORD FontSize;
-        BOOL FontIsBold;
-        BOOL FontIsItalic;
-        BOOL FontIsUnderline;
         DWORD FontScaleX;
         DWORD FontScaleY;
         DWORD FontSpacing;

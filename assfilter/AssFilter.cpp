@@ -556,9 +556,6 @@ HRESULT AssFilter::LoadDefaults()
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 50;
-    m_settings.FontIsBold = FALSE;
-    m_settings.FontIsItalic = FALSE;
-    m_settings.FontIsUnderline = FALSE;
     m_settings.FontScaleX = 100;
     m_settings.FontScaleY = 100;
     m_settings.FontSpacing = 0;
@@ -598,15 +595,6 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
 
         dwVal = reg.ReadDWORD(L"FontSize", hr);
         if (SUCCEEDED(hr)) m_settings.FontSize = dwVal;
-
-        bFlag = reg.ReadBOOL(L"FontIsBold", hr);
-        if (SUCCEEDED(hr)) m_settings.FontIsBold = bFlag;
-
-        bFlag = reg.ReadBOOL(L"FontIsItalic", hr);
-        if (SUCCEEDED(hr)) m_settings.FontIsItalic = bFlag;
-
-        bFlag = reg.ReadBOOL(L"FontIsUnderline", hr);
-        if (SUCCEEDED(hr)) m_settings.FontIsUnderline = bFlag;
 
         dwVal = reg.ReadDWORD(L"FontScaleX", hr);
         if (SUCCEEDED(hr)) m_settings.FontScaleX = dwVal;
@@ -677,9 +665,6 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
-        reg.WriteBOOL(L"FontIsBold", m_settings.FontIsBold);
-        reg.WriteBOOL(L"FontIsItalic", m_settings.FontIsItalic);
-        reg.WriteBOOL(L"FontIsUnderline", m_settings.FontIsUnderline);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);
         reg.WriteDWORD(L"FontScaleY", m_settings.FontScaleY);
         reg.WriteDWORD(L"FontSpacing", m_settings.FontSpacing);
