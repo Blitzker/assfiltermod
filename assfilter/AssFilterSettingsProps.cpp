@@ -674,6 +674,13 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
             if (value != m_settings.ColorPrimary >> 24)
                 SetDirty();
         }
+        else if (LOWORD(wParam) == IDC_EDIT11 && HIWORD(wParam) == EN_CHANGE)
+        {
+            WCHAR wsCustomBuffer[1024];
+            SendDlgItemMessage(m_Dlg, LOWORD(wParam), WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
+            if (wcscmp(wsCustomBuffer, m_settings.CustomTags.c_str()) != 0)
+                SetDirty();
+        }
         else if (LOWORD(wParam) == IDC_EDIT12 && HIWORD(wParam) == EN_CHANGE)
         {
             WCHAR buffer[10];
