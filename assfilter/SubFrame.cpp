@@ -35,6 +35,7 @@ SubFrame::SubFrame(RECT rect, ULONGLONG id, ASS_Image* image)
     : CUnknown("", nullptr)
     , m_rect(rect)
     , m_id(id)
+    , m_pixelsRect{}
 {
     Flatten(image);
 }

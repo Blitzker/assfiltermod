@@ -1,0 +1,5 @@
+v0.2
+- fix: The Apply button now activate when a change is made in Custom Tags
+
+v0.1
+- Initial Release
