@@ -38,6 +38,7 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_stringOptions["version"] = L"0.1.1.0";
     m_stringOptions["yuvMatrix"] = L"None";
     m_boolOptions["combineBitmaps"] = false;
+    m_boolOptions["isMovable"] = false;
 
     m_bSrtHeaderDone = false;
 
@@ -108,9 +109,11 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
         m_sSubType.assign("SRT");
 
         m_bSrtHeaderDone = false;
+        m_boolOptions["isMovable"] = true;
     }
     else
     {
+        m_boolOptions["isMovable"] = false;
         ass_process_codec_private(m_track.get(), (char*)mt.Format() + psi->dwOffset, mt.FormatLength() - psi->dwOffset);
     }
 
@@ -309,8 +312,14 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
     CAutoLock lock(this);
 
     CheckPointer(m_consumer, E_UNEXPECTED);
+
     RECT videoOutputRect;
     m_consumer->GetRect("videoOutputRect", &videoOutputRect);
+    DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() videoOutputRect: %u, %u, %u, %u", videoOutputRect.left, videoOutputRect.top, videoOutputRect.right, videoOutputRect.bottom));
+
+    RECT subtitleTargetRect;
+    m_consumer->GetRect("subtitleTargetRect", &subtitleTargetRect);
+    DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
 
     ass_set_frame_size(m_renderer.get(), videoOutputRect.right , videoOutputRect.bottom);
 
@@ -379,7 +388,8 @@ STDMETHODIMP AssFilter::GetBin(LPCSTR field, LPVOID* value, int* size)
 
 STDMETHODIMP AssFilter::SetBool(LPCSTR field, bool value)
 {
-    m_boolOptions[field] = value;
+    if (!strcmp(field, "combineBitmaps"))
+        m_boolOptions[field] = value;
     return S_OK;
 }
 
