@@ -158,6 +158,8 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
     REFERENCE_TIME tStart, tStop;
     BYTE* pData;
 
+    CAutoLock lock(this);
+
     if (SUCCEEDED(pSample->GetTime(&tStart, &tStop)) &&
         SUCCEEDED(pSample->GetPointer(&pData)))
     {
