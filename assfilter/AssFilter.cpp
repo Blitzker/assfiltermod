@@ -378,6 +378,9 @@ STDMETHODIMP AssFilter::GetString(LPCSTR field, LPWSTR* value, int* chars)
     *value = (LPWSTR)LocalAlloc(0, (len + 1) * sizeof(WCHAR));
     memcpy(*value, str.data(), len * sizeof(WCHAR));
     (*value)[len] = '\0';
+    if (chars)
+        *chars = static_cast<int>(len);
+    DbgLog((LOG_TRACE, 1, L"AssFilter::GetString() field: %S, value: %s, chars: %d", field, *value, *chars));
     return S_OK;
 }
 

@@ -2,6 +2,7 @@ not yet released
 - add: Support for movable subtitles (SRT)
 - fix: The Apply button now activate when a change is made in Custom Tags
 - fix: Random crash when the media player open a file
+- fix: "Please update your subtitle renderer" message on madVR
 
 v0.1
 - Initial Release
