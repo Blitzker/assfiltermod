@@ -321,10 +321,29 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
     m_consumer->GetRect("subtitleTargetRect", &subtitleTargetRect);
     DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
 
-    ass_set_frame_size(m_renderer.get(), videoOutputRect.right , videoOutputRect.bottom);
+    // The video rect we render the subtitles on
+    RECT videoRect;
+
+    // Check to draw subtitles at original video size
+    if (m_settings.NativeSize)
+    {
+        SIZE originalVideoSize;
+        m_consumer->GetSize("originalVideoSize", &originalVideoSize);
+
+        videoRect.left = 0;
+        videoRect.top = 0;
+        videoRect.right = originalVideoSize.cx;
+        videoRect.bottom = originalVideoSize.cy;
+    }
+    else
+        videoRect = videoOutputRect;
+
+    ass_set_frame_size(m_renderer.get(), videoRect.right , videoRect.bottom);
+
+    DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() videoRect: %u, %u, %u, %u", videoRect.left, videoRect.top, videoRect.right, videoRect.bottom));
 
     int frameChange = 0;
-    ISubRenderFramePtr frame = new SubFrame(videoOutputRect, m_consumerLastId++,
+    ISubRenderFramePtr frame = new SubFrame(videoRect, m_consumerLastId++,
                                             ass_render_frame(m_renderer.get(), m_track.get(), start / 10000, &frameChange));
     return m_consumer->DeliverFrame(start, stop, context, frame);
 }
@@ -568,6 +587,7 @@ void AssFilter::ParseSrtLine(std::string &srtLine)
 HRESULT AssFilter::LoadDefaults()
 {
     m_settings.TrayIcon = FALSE;
+    m_settings.NativeSize = FALSE;
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 50;
@@ -604,6 +624,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
     {
         bFlag = reg.ReadBOOL(L"TrayIcon", hr);
         if (SUCCEEDED(hr)) m_settings.TrayIcon = bFlag;
+
+        bFlag = reg.ReadBOOL(L"NativeSize", hr);
+        if (SUCCEEDED(hr)) m_settings.NativeSize = bFlag;
 
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
@@ -678,6 +701,7 @@ HRESULT AssFilter::SaveSettings()
     if (SUCCEEDED(hr))
     {
         reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
+        reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);

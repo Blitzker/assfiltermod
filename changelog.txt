@@ -1,5 +1,6 @@
 not yet released
-- add: Support for movable subtitles (SRT)
+- add: Support(incomplete) for movable subtitles (SRT)
+- add: Support for drawing subtitles at original video size
 - fix: The Apply button now activate when a change is made in Custom Tags
 - fix: Random crash when the media player open a file
 - fix: "Please update your subtitle renderer" message on madVR

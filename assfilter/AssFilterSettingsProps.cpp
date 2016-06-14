@@ -77,6 +77,8 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
     hr = LoadSettings();
     if (SUCCEEDED(hr))
     {
+        SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_SETCHECK, m_settings.NativeSize, 0);
+
         SendDlgItemMessage(m_Dlg, IDC_FONT, WM_SETTEXT, 0, (LPARAM)m_settings.FontName.c_str());
 
         WCHAR stringBuffer[100];
@@ -183,6 +185,8 @@ HRESULT CAssFilterSettingsProp::OnApplyChanges(void)
     HRESULT hr = S_OK;
 
     // Sanity check before saving the settings
+    m_settings.NativeSize = (BOOL)SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_GETCHECK, 0, 0);
+
     if (m_settings.FontName.empty())
         m_settings.FontName.assign(L"Arial");
 
@@ -308,6 +312,9 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
         bFlag = reg.ReadBOOL(L"TrayIcon", hr);
         if (SUCCEEDED(hr)) m_settings.TrayIcon = bFlag;
 
+        bFlag = reg.ReadBOOL(L"NativeSize", hr);
+        if (SUCCEEDED(hr)) m_settings.NativeSize = bFlag;
+
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
 
@@ -370,6 +377,7 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr);
     if (SUCCEEDED(hr)) {
         reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
+        reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);
@@ -420,7 +428,11 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
     switch (uMsg)
     {
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDC_FONT)
+        if (LOWORD(wParam) == IDC_CHECK1 && HIWORD(wParam) == BN_CLICKED)
+        {
+            SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_FONT)
         {
             CHOOSEFONT cf {};
             LOGFONT lf {};

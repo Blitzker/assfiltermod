@@ -121,6 +121,7 @@ private:
         BOOL TrayIcon;
 
         std::wstring FontName;
+        BOOL NativeSize;
         DWORD FontSize;
         DWORD FontScaleX;
         DWORD FontScaleY;

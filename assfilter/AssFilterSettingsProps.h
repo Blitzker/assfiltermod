@@ -41,6 +41,7 @@ private:
     struct SrtSettings
     {
         BOOL TrayIcon;
+        BOOL NativeSize;
 
         std::wstring FontName;
         DWORD FontSize;
