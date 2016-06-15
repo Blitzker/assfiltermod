@@ -1036,7 +1036,7 @@ HRESULT CAssFilterAboutProp::OnActivate(void)
 
     HFONT hFont {};
     LOGFONT lf {};
-    HWND hwnd = GetDlgItem(NULL, IDC_VERSION);
+    HWND hwnd = GetDlgItem(NULL, IDC_NAME);
     HDC hdc = GetDC(hwnd);
 
     lf.lfHeight = -MulDiv(10, GetDeviceCaps(hdc, LOGPIXELSY), 72);
@@ -1044,9 +1044,17 @@ HRESULT CAssFilterAboutProp::OnActivate(void)
     wcscpy_s(lf.lfFaceName, L"Arial");
     hFont = CreateFontIndirect(&lf);
     ReleaseDC(hwnd, hdc);
-    SendDlgItemMessage(m_Dlg, IDC_VERSION, WM_SETFONT, (WPARAM)hFont, (LPARAM)MAKELONG(TRUE, 0));
+    SendDlgItemMessage(m_Dlg, IDC_NAME, WM_SETFONT, (WPARAM)hFont, (LPARAM)MAKELONG(TRUE, 0));
 
-    const WCHAR *version = TEXT("AssFilterMod") L" " TEXT(ASSF_VERSION_STR);
+#ifdef _WIN64
+    const WCHAR *name = TEXT("AssFilterMod (x64)");
+#else
+    const WCHAR *name = TEXT("AssFilterMod (x32)");
+#endif // _WIN64
+
+    SendDlgItemMessage(m_Dlg, IDC_NAME, WM_SETTEXT, 0, (LPARAM)name);
+
+    const WCHAR *version = TEXT("version ") TEXT(ASSF_VERSION_STR) L" (" TEXT(ASSF_HASH_STR) L")";
     SendDlgItemMessage(m_Dlg, IDC_VERSION, WM_SETTEXT, 0, (LPARAM)version);
 
     ASSERT(m_pAssFilterSettings != nullptr);

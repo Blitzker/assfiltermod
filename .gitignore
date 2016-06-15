@@ -7,3 +7,4 @@
 *.user
 /bin
 /ipch
+version_rev.h

@@ -194,12 +194,13 @@ IDD_PROPPAGE_ABOUT DIALOGEX 0, 0, 181, 154
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_BORDER
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CTEXT           "AssFilterMod 0.1.1",IDC_VERSION,7,7,160,12
-    LTEXT           "Based on AssFilter by Alex Marsev",IDC_STATIC,7,36,160,8
-    LTEXT           "Credits:",IDC_STATIC,7,54,160,8
-    LTEXT           "Nevcairiel (Borrowed code from LAV Filters)",IDC_STATIC,7,64,160,8
-    LTEXT           "stackoverflow.com (Useful bits of code)",IDC_STATIC,7,74,160,8
-    CTEXT           "by Blitzker",IDC_STATIC,7,17,160,8
+    CTEXT           "name",IDC_NAME,7,7,160,12
+    LTEXT           "Based on AssFilter by Alex Marsev",IDC_STATIC,7,55,160,8
+    LTEXT           "Credits:",IDC_STATIC,7,73,160,8
+    LTEXT           "Nevcairiel (Borrowed code from LAV Filters)",IDC_STATIC,7,83,160,8
+    LTEXT           "stackoverflow.com (Useful bits of code)",IDC_STATIC,7,93,160,8
+    CTEXT           "by Blitzker",IDC_STATIC,7,32,160,8
+    CTEXT           "version",IDC_VERSION,7,18,160,8
 END
 
 

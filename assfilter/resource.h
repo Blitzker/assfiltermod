@@ -11,7 +11,7 @@
 #define IDI_ICON1                       107
 #define IDC_TEST1                       1001
 #define IDC_FONT                        1002
-#define IDC_VERSION                     1003
+#define IDC_NAME                        1003
 #define IDC_TEST2                       1004
 #define IDC_EDIT1                       1005
 #define IDC_TEST3                       1005
@@ -55,6 +55,7 @@
 #define IDC_BUTTON3                     1045
 #define IDC_BUTTON4                     1046
 #define IDC_CHECK1                      1047
+#define IDC_VERSION                     1048
 
 // Next default values for new objects
 // 
@@ -62,7 +63,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1048
+#define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

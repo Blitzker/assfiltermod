@@ -21,6 +21,8 @@
 #define ASSF_VERSION_MINOR     1
 #define ASSF_VERSION_REVISION  1
 
+#include "../version_rev.h"
+
 /////////////////////////////////////////////////////////
 #ifndef ISPP_INCLUDED
 
@@ -31,5 +33,6 @@
 #define ASSF_VERSION_TAG ASSF_VERSION_MAJOR, ASSF_VERSION_MINOR, ASSF_VERSION_REVISION
 
 #define ASSF_VERSION_STR MAKE_STR(ASSF_VERSION)
+#define ASSF_HASH_STR MAKE_STR(ASSF_VERSION_HASH)
 
 #endif
