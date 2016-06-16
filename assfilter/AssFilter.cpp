@@ -322,18 +322,57 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
     DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
 
     // The video rect we render the subtitles on
-    RECT videoRect;
+    RECT videoRect{};
 
-    // Check to draw subtitles at original video size
+    // Check to draw subtitles at custom resolution
     if (m_settings.NativeSize)
     {
         SIZE originalVideoSize;
         m_consumer->GetSize("originalVideoSize", &originalVideoSize);
 
-        videoRect.left = 0;
-        videoRect.top = 0;
-        videoRect.right = originalVideoSize.cx;
-        videoRect.bottom = originalVideoSize.cy;
+        switch (m_settings.CustomRes)
+        {
+        case 0:
+            videoRect.right = originalVideoSize.cx;
+            videoRect.bottom = originalVideoSize.cy;
+            break;
+        case 1:
+            videoRect.right = 3840;
+            videoRect.bottom = 2160;
+            break;
+        case 2:
+            videoRect.right = 2560;
+            videoRect.bottom = 1440;
+            break;
+        case 3:
+            videoRect.right = 1920;
+            videoRect.bottom = 1080;
+            break;
+        case 4:
+            videoRect.right = 1440;
+            videoRect.bottom = 900;
+            break;
+        case 5:
+            videoRect.right = 1280;
+            videoRect.bottom = 720;
+            break;
+        case 6:
+            videoRect.right = 1024;
+            videoRect.bottom = 768;
+            break;
+        case 7:
+            videoRect.right = 800;
+            videoRect.bottom = 600;
+            break;
+        case 8:
+            videoRect.right = 640;
+            videoRect.bottom = 480;
+            break;
+        default:
+            videoRect.right = originalVideoSize.cx;
+            videoRect.bottom = originalVideoSize.cy;
+            break;
+        }
     }
     else
         videoRect = videoOutputRect;
@@ -606,6 +645,7 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.ColorSecondary = 0x00FFFF;
     m_settings.ColorOutline = 0;
     m_settings.ColorShadow = 0;
+    m_settings.CustomRes = 0;
 
     m_settings.CustomTags = L"";
 
@@ -676,6 +716,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
         dwVal = reg.ReadDWORD(L"ColorShadow", hr);
         if (SUCCEEDED(hr)) m_settings.ColorShadow = dwVal;
 
+        dwVal = reg.ReadDWORD(L"CustomRes", hr);
+        if (SUCCEEDED(hr)) m_settings.CustomRes = dwVal;
+
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
     }
@@ -718,6 +761,7 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteDWORD(L"ColorSecondary", m_settings.ColorSecondary);
         reg.WriteDWORD(L"ColorOutline", m_settings.ColorOutline);
         reg.WriteDWORD(L"ColorShadow", m_settings.ColorShadow);
+        reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
     }
 

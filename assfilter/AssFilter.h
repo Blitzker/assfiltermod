@@ -137,6 +137,7 @@ private:
         DWORD ColorSecondary;
         DWORD ColorOutline;
         DWORD ColorShadow;
+        DWORD CustomRes;
 
         std::wstring CustomTags;
     } m_settings;

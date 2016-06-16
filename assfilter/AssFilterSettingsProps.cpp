@@ -77,8 +77,6 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
     hr = LoadSettings();
     if (SUCCEEDED(hr))
     {
-        SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_SETCHECK, m_settings.NativeSize, 0);
-
         SendDlgItemMessage(m_Dlg, IDC_FONT, WM_SETTEXT, 0, (LPARAM)m_settings.FontName.c_str());
 
         WCHAR stringBuffer[100];
@@ -168,6 +166,17 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
         SendDlgItemMessage(m_Dlg, IDC_SPIN11, UDM_SETRANGE32, 0, 255);
 
         SendDlgItemMessage(m_Dlg, IDC_EDIT11, WM_SETTEXT, 0, (LPARAM)m_settings.CustomTags.c_str());
+
+        SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_SETCHECK, m_settings.NativeSize, 0);
+
+        const WCHAR customResolution[9][25] = { L"Video", L"3840x2160", L"2560x1440",
+                                                L"1920x1080", L"1440x900", L"1280x720",
+                                                L"1024x768", L"800x600", L"640x480" };
+        SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_RESETCONTENT, 0, 0);
+        for (int i = 0; i < 9; i++)
+            SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)customResolution[i]);
+        SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_SETCURSEL, m_settings.CustomRes, 0);
+        EnableWindow(GetDlgItem(m_Dlg, IDC_COMBO1), m_settings.NativeSize);
     }
 
     // Erase the names of the custom draw buttons
@@ -293,6 +302,8 @@ HRESULT CAssFilterSettingsProp::OnApplyChanges(void)
         iBuffer = 0;
     m_settings.ColorShadow = (m_settings.ColorShadow & 0x00FFFFFF) | (DWORD)iBuffer << 24;
 
+    m_settings.CustomRes = (DWORD)SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_GETCURSEL, 0, 0);
+
     WCHAR wsCustomBuffer[1024];
     SendDlgItemMessage(m_Dlg, IDC_EDIT11, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
     m_settings.CustomTags.assign(wsCustomBuffer);
@@ -363,6 +374,9 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
         dwVal = reg.ReadDWORD(L"ColorShadow", hr);
         if (SUCCEEDED(hr)) m_settings.ColorShadow = dwVal;
 
+        dwVal = reg.ReadDWORD(L"CustomRes", hr);
+        if (SUCCEEDED(hr)) m_settings.CustomRes = dwVal;
+
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
     }
@@ -394,6 +408,7 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
         reg.WriteDWORD(L"ColorSecondary", m_settings.ColorSecondary);
         reg.WriteDWORD(L"ColorOutline", m_settings.ColorOutline);
         reg.WriteDWORD(L"ColorShadow", m_settings.ColorShadow);
+        reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
     }
 
@@ -431,6 +446,7 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
         if (LOWORD(wParam) == IDC_CHECK1 && HIWORD(wParam) == BN_CLICKED)
         {
             SetDirty();
+            EnableWindow(GetDlgItem(m_Dlg, IDC_COMBO1), (BOOL)SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_GETCHECK, 0, 0));
         }
         else if (LOWORD(wParam) == IDC_FONT)
         {
@@ -783,6 +799,11 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
             if (m_settings.LineAlignment != 3)
                 SetDirty();
         }
+        else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_COMBO1)
+        {
+            if (m_settings.CustomRes != (DWORD)SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_GETCURSEL, 0, 0))
+                SetDirty();
+        }
         break;
 
     // Manage the custom draw buttons
@@ -1034,6 +1055,8 @@ HRESULT CAssFilterAboutProp::OnActivate(void)
         return E_FAIL;
     }
 
+    ASSERT(m_pAssFilterSettings != nullptr);
+
     HFONT hFont {};
     LOGFONT lf {};
     HWND hwnd = GetDlgItem(NULL, IDC_NAME);
@@ -1056,8 +1079,6 @@ HRESULT CAssFilterAboutProp::OnActivate(void)
 
     const WCHAR *version = TEXT("version ") TEXT(ASSF_VERSION_STR) L" (" TEXT(ASSF_HASH_STR) L")";
     SendDlgItemMessage(m_Dlg, IDC_VERSION, WM_SETTEXT, 0, (LPARAM)version);
-
-    ASSERT(m_pAssFilterSettings != nullptr);
 
     return hr;
 }
