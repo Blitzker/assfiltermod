@@ -88,7 +88,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;CONFIG_RASTERIZER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -101,7 +101,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;CONFIG_RASTERIZER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -116,7 +116,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;CONFIG_RASTERIZER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -133,7 +133,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;CONFIG_RASTERIZER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -142,6 +142,17 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <Yasm Include="upstream\libass\x86\be_blur.asm">
+      <ExcludeFromBuild Condition="'$(Platform)'!='x64'">true</ExcludeFromBuild>
+    </Yasm>
+    <Yasm Include="upstream\libass\x86\cpuid.asm" />
+    <Yasm Include="upstream\libass\x86\rasterizer.asm" />
+    <Yasm Include="upstream\libass\x86\blend_bitmaps.asm" />
+    <Yasm Include="upstream\libass\x86\blur.asm" />
+    <Yasm Include="upstream\libass\x86\utils.asm" />
+    <Yasm Include="upstream\libass\x86\x86inc.asm" />
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="dirent.h" />
@@ -171,6 +182,7 @@
     <ClCompile Include="upstream\libass\ass_utils.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
+  <ImportGroup Label="Targets">
+    <Import Project="$(MSBuildThisFileDirectory)..\yasm.targets" />
   </ImportGroup>
 </Project>

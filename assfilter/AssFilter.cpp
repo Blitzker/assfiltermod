@@ -37,6 +37,7 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_stringOptions["name"] = L"AssFilterMod";
     m_stringOptions["version"] = L"0.1.1.0";
     m_stringOptions["yuvMatrix"] = L"None";
+    m_stringOptions["outputLevels"] = L"PC";
     m_boolOptions["combineBitmaps"] = false;
     m_boolOptions["isMovable"] = false;
 
