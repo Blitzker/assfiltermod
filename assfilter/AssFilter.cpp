@@ -206,7 +206,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
 
             // Subtitle data is in UTF-8 format.
             char subLineData[1024] {};
-            strncpy_s(subLineData, _countof(subLineData), (char*)pData, pSample->GetSize());
+            strncpy_s(subLineData, _countof(subLineData), (char*)pData, pSample->GetActualDataLength());
             std::string str = subLineData;
 
             // This is the way i use to get a unique id for the subtitle line
@@ -227,7 +227,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
         }
         else
         {
-            ass_process_chunk(m_track.get(), (char*)pData, pSample->GetSize(), tStart / 10000, (tStop - tStart) / 10000);
+            ass_process_chunk(m_track.get(), (char*)pData, pSample->GetActualDataLength(), tStart / 10000, (tStop - tStart) / 10000);
         }
     }
 }
@@ -318,9 +318,9 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
     m_consumer->GetRect("videoOutputRect", &videoOutputRect);
     DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() videoOutputRect: %u, %u, %u, %u", videoOutputRect.left, videoOutputRect.top, videoOutputRect.right, videoOutputRect.bottom));
 
-    RECT subtitleTargetRect;
-    m_consumer->GetRect("subtitleTargetRect", &subtitleTargetRect);
-    DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
+    //RECT subtitleTargetRect;
+    //m_consumer->GetRect("subtitleTargetRect", &subtitleTargetRect);
+    //DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
 
     // The video rect we render the subtitles on
     RECT videoRect{};
