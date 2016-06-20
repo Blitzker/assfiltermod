@@ -221,8 +221,8 @@ IDI_ICON1               ICON                    "icon1.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,1,0
- PRODUCTVERSION 0,1,1,0
+ FILEVERSION 0,2,0,0
+ PRODUCTVERSION 0,2,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -239,12 +239,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "AssFilterMod Team"
             VALUE "FileDescription", "DirectShow subtitle renderer"
-            VALUE "FileVersion", "0.1.1.0"
+            VALUE "FileVersion", "0.2.0.0"
             VALUE "InternalName", "assfiltermod.dll"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "OriginalFilename", "assfiltermod.dll"
             VALUE "ProductName", "AssFilterMod"
-            VALUE "ProductVersion", "0.1.1.0"
+            VALUE "ProductVersion", "0.2.0.0"
         END
     END
     BLOCK "VarFileInfo"

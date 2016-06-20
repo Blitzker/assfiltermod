@@ -1,4 +1,4 @@
-not yet released
+v0.2
 - add: Support(incomplete) for movable subtitles (SRT)
 - add: Support for drawing subtitles at custom resolution
 - fix: The Apply button now activate when a change is made in Custom Tags

@@ -18,8 +18,8 @@
 #pragma once
 
 #define ASSF_VERSION_MAJOR     0
-#define ASSF_VERSION_MINOR     1
-#define ASSF_VERSION_REVISION  1
+#define ASSF_VERSION_MINOR     2
+#define ASSF_VERSION_REVISION  0
 
 #include "../version_rev.h"
 
