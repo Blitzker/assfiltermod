@@ -4,6 +4,7 @@ not yet released
 - fix: The Apply button now activate when a change is made in Custom Tags
 - fix: Random crash when the media player open a file
 - fix: "Please update your subtitle renderer" message on madVR
+- fix: Badly displayed subtitles with mpc-be internal mkv splitter
 
 v0.1
 - Initial Release

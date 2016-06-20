@@ -17,7 +17,7 @@ AssFilterMod is a version of AssFilter with new features and bug fixes:
 
 The SRT subtitles can be configured via the Settings tab.
 
-![img](http://i.imgur.com/9J121tH.png)
+![img](http://i.imgur.com/k5HCTf2.png)
 
 In the Custom Tags edit control, you can enter [Ass Tags](http://docs.aegisub.org/3.1/ASS_Tags/) and customize your SRT subtitles the way you want.
 
@@ -32,7 +32,7 @@ Ex: If you want your subtitles to be **BOLD**, enter `{\b1}`.
 * [Visual Studio 2015 Update 2 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=51682)
 * [DirectX 9 Redistribuables](https://www.microsoft.com/en-ca/download/details.aspx?id=8109)
 
-Supports Windows Vista, 7, 8 and 10 (32 and 64 bits)
+Supports Windows Vista, 7, 8, 8.1 and 10 (32 and 64 bits)
 
 ### Releases
 Can be found here https://github.com/Blitzker/assfiltermod/releases
