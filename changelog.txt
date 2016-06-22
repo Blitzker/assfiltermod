@@ -1,3 +1,6 @@
+not yet released
+- fix: Blur setting not working
+
 v0.2
 - add: Support(incomplete) for movable subtitles (SRT)
 - add: Support for drawing subtitles at custom resolution

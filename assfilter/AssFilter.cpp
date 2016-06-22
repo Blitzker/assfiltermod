@@ -220,6 +220,11 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
             // Add the custom tags
             str.insert(0, ws2s(m_settings.CustomTags));
 
+            // Add blur
+            char blur[20] {};
+            _snprintf_s(blur, _TRUNCATE, "{\\blur%u}", m_settings.FontBlur);
+            str.insert(0, blur);
+
             // ASS in MKV: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             char outBuffer[1024] {};
             _snprintf_s(outBuffer, _TRUNCATE, "%lld,0,Default,Main,0,0,0,,%s", m_iSubLineCount, str.c_str());
