@@ -58,7 +58,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 328
         TOPMARGIN, 7
-        BOTTOMMARGIN, 273
+        BOTTOMMARGIN, 289
     END
 
     IDD_PROPPAGE_STATUS, DIALOG
@@ -106,7 +106,7 @@ END
 // Dialog
 //
 
-IDD_PROPPAGE_SETTINGS DIALOGEX 0, 0, 336, 280
+IDD_PROPPAGE_SETTINGS DIALOGEX 0, 0, 336, 296
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_BORDER
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -171,6 +171,7 @@ BEGIN
     CONTROL         "Override subtitles resolution",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,238,106,10
     GROUPBOX        "Custom Subtitles Resolution",IDC_STATIC,7,222,313,37
     COMBOBOX        IDC_COMBO1,182,237,60,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,265,84,14
 END
 
 IDD_PROPPAGE_STATUS DIALOGEX 0, 0, 245, 128
@@ -221,8 +222,8 @@ IDI_ICON1               ICON                    "icon1.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,0,0
- PRODUCTVERSION 0,2,0,0
+ FILEVERSION 0,2,1,0
+ PRODUCTVERSION 0,2,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -239,12 +240,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "AssFilterMod Team"
             VALUE "FileDescription", "DirectShow subtitle renderer"
-            VALUE "FileVersion", "0.2.0.0"
+            VALUE "FileVersion", "0.2.1.0"
             VALUE "InternalName", "assfiltermod.dll"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "OriginalFilename", "assfiltermod.dll"
             VALUE "ProductName", "AssFilterMod"
-            VALUE "ProductVersion", "0.2.0.0"
+            VALUE "ProductVersion", "0.2.1.0"
         END
     END
     BLOCK "VarFileInfo"

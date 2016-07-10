@@ -169,9 +169,9 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
 
         SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_SETCHECK, m_settings.NativeSize, 0);
 
-        const WCHAR customResolution[9][25] = { L"Video", L"3840x2160", L"2560x1440",
-                                                L"1920x1080", L"1440x900", L"1280x720",
-                                                L"1024x768", L"800x600", L"640x480" };
+        const WCHAR* customResolution[9] = { L"Video", L"3840x2160", L"2560x1440",
+                                             L"1920x1080", L"1440x900", L"1280x720",
+                                             L"1024x768", L"800x600", L"640x480" };
         SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_RESETCONTENT, 0, 0);
         for (int i = 0; i < 9; i++)
             SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)customResolution[i]);
@@ -380,6 +380,87 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
     }
+
+    return S_OK;
+}
+
+HRESULT CAssFilterSettingsProp::LoadDefaults()
+{
+    m_settings.TrayIcon = FALSE;
+    m_settings.NativeSize = FALSE;
+
+    m_settings.FontName = L"Arial";
+    m_settings.FontSize = 50;
+    m_settings.FontScaleX = 100;
+    m_settings.FontScaleY = 100;
+    m_settings.FontSpacing = 0;
+    m_settings.FontBlur = 0;
+
+    m_settings.FontOutline = 2;
+    m_settings.FontShadow = 0;
+    m_settings.LineAlignment = 2;
+    m_settings.MarginLeft = 120;
+    m_settings.MarginRight = 120;
+    m_settings.MarginVertical = 20;
+    m_settings.ColorPrimary = 0x00FFFFFF;
+    m_settings.ColorSecondary = 0x00FFFF;
+    m_settings.ColorOutline = 0;
+    m_settings.ColorShadow = 0;
+    m_settings.CustomRes = 0;
+
+    m_settings.CustomTags = L"";
+
+    SendDlgItemMessage(m_Dlg, IDC_FONT, WM_SETTEXT, 0, (LPARAM)m_settings.FontName.c_str());
+
+    WCHAR stringBuffer[100];
+    swprintf_s(stringBuffer, L"%u", m_settings.FontScaleX);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT1, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", m_settings.FontScaleY);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT2, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", m_settings.FontSpacing);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT3, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", m_settings.FontBlur);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT4, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", m_settings.FontOutline);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT5, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", m_settings.FontShadow);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT6, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    m_settings.LineAlignment = 2;
+    SendDlgItemMessage(m_Dlg, IDC_RADIO8, BM_SETCHECK, BST_CHECKED, 0);
+
+    swprintf_s(stringBuffer, L"%d", m_settings.MarginLeft);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT7, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%d", m_settings.MarginRight);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT8, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%d", m_settings.MarginVertical);
+    SendDlgItemMessage(m_Dlg, IDC_EDIT9, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", (m_settings.ColorPrimary >> 24));
+    SendDlgItemMessage(m_Dlg, IDC_EDIT10, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", (m_settings.ColorSecondary >> 24));
+    SendDlgItemMessage(m_Dlg, IDC_EDIT12, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", (m_settings.ColorOutline >> 24));
+    SendDlgItemMessage(m_Dlg, IDC_EDIT13, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    swprintf_s(stringBuffer, L"%u", (m_settings.ColorShadow >> 24));
+    SendDlgItemMessage(m_Dlg, IDC_EDIT14, WM_SETTEXT, 0, (LPARAM)stringBuffer);
+
+    SendDlgItemMessage(m_Dlg, IDC_EDIT11, WM_SETTEXT, 0, (LPARAM)m_settings.CustomTags.c_str());
+
+    SendDlgItemMessage(m_Dlg, IDC_CHECK1, BM_SETCHECK, m_settings.NativeSize, 0);
+
+    SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_SETCURSEL, m_settings.CustomRes, 0);
+    EnableWindow(GetDlgItem(m_Dlg, IDC_COMBO1), m_settings.NativeSize);
 
     return S_OK;
 }
@@ -803,6 +884,12 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
         {
             if (m_settings.CustomRes != (DWORD)SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_GETCURSEL, 0, 0))
                 SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_BUTTONRESET)
+        {
+            LoadDefaults();
+            InvalidateRect(GetParent(hwnd), NULL, FALSE);
+            SetDirty();
         }
         break;
 

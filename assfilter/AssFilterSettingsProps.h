@@ -65,6 +65,7 @@ private:
     } m_settings;
 
     HRESULT LoadSettings();
+    HRESULT LoadDefaults();
     HRESULT SaveSettings();
 
     void DrawCustomButton(LPNMCUSTOMDRAW &lpnmCD, COLORREF crPen, COLORREF crBrush);

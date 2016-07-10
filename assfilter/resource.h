@@ -43,20 +43,21 @@
 #define IDC_SPIN7                       1029
 #define IDC_EDIT10                      1030
 #define IDC_SPIN8                       1031
-#define IDC_EDIT12                      1033
-#define IDC_SPIN9                       1035
-#define IDC_EDIT13                      1037
-#define IDC_SPIN10                      1039
-#define IDC_EDIT11                      1040
-#define IDC_EDIT14                      1041
-#define IDC_SPIN11                      1042
-#define IDC_BUTTON1                     1043
-#define IDC_BUTTON2                     1044
-#define IDC_BUTTON3                     1045
-#define IDC_BUTTON4                     1046
-#define IDC_CHECK1                      1047
-#define IDC_VERSION                     1048
-#define IDC_COMBO1                      1049
+#define IDC_EDIT12                      1032
+#define IDC_SPIN9                       1033
+#define IDC_EDIT13                      1034
+#define IDC_SPIN10                      1035
+#define IDC_EDIT11                      1036
+#define IDC_EDIT14                      1037
+#define IDC_SPIN11                      1038
+#define IDC_BUTTON1                     1039
+#define IDC_BUTTON2                     1040
+#define IDC_BUTTON3                     1041
+#define IDC_BUTTON4                     1042
+#define IDC_CHECK1                      1043
+#define IDC_VERSION                     1044
+#define IDC_COMBO1                      1045
+#define IDC_BUTTONRESET                 1046
 
 // Next default values for new objects
 // 
@@ -64,7 +65,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1050
+#define _APS_NEXT_CONTROL_VALUE         1047
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

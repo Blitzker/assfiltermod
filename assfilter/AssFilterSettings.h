@@ -22,8 +22,8 @@ DEFINE_GUID(IID_IAssFilterSettings,
 0x2e277fb7, 0x75c0, 0x453c, 0xa1, 0xed, 0xa6, 0xb6, 0xfd, 0x6f, 0x47, 0x28);
 
 // AssFilter Settings Interface
-[uuid("2E277FB7-75C0-453C-A1ED-A6B6FD6F4728")]
-interface IAssFilterSettings : public IUnknown
+interface __declspec(uuid("2E277FB7-75C0-453C-A1ED-A6B6FD6F4728"))
+IAssFilterSettings : public IUnknown
 {
     // Get the current subtitle track name and language
     STDMETHOD(GetTrackInfo)(LPCWSTR *pTrackName, LPCSTR *pTrackLang, LPCSTR *pSubType) = 0;
