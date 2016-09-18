@@ -29,10 +29,10 @@ Ex: If you want your subtitles to be **BOLD**, enter `{\b1}`.
 * Only subtitles (ASS and SRT) muxed in MKV files are supported.
 
 ### Requirements
-* [Visual Studio 2015 Update 2 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=51682)
+* [Visual Studio 2015 Update 3 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=52982)
 * [DirectX 9 Redistribuables](https://www.microsoft.com/en-ca/download/details.aspx?id=8109)
 
-Supports Windows Vista, 7, 8, 8.1 and 10 (32 and 64 bits)
+Windows Vista, 7, 8, 8.1 and 10 (32 and 64 bits)
 
 ### Releases
 Can be found here https://github.com/Blitzker/assfiltermod/releases
@@ -40,7 +40,7 @@ Can be found here https://github.com/Blitzker/assfiltermod/releases
 ### Compilation
 Compiling AssFilterMod is pretty straightforward:
 
-* Have `Visual Studio Community 2015 Update 2` installed.
+* Have `Visual Studio Community 2015 Update 3` installed.
 * Check out `master` branch of assfiltermod.
 * Ensure that all submodules are up-to-date by running `git submodule update --init --recursive` from inside the tree.
 * Open `assfiltermod.sln` solution file and build.

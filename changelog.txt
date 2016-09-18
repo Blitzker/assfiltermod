@@ -1,5 +1,7 @@
 not yet released
+- add: Reset Settings button
 - fix: Blur setting not working
+- Update to Visual Studio Update 3
 
 v0.2
 - add: Support(incomplete) for movable subtitles (SRT)
