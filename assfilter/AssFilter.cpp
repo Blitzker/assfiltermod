@@ -215,7 +215,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
             m_iSubLineCount = tStart / 10000;
 
             // Change srt tags to ass tags
-            ParseSrtLine(str);
+            ParseSrtLine(str, m_settings.ColorPrimary, m_settings.ColorOutline);
 
             // Add the custom tags
             str.insert(0, ws2s(m_settings.CustomTags));
@@ -589,44 +589,6 @@ STDMETHODIMP AssFilter::GetConsumerInfo(const WCHAR **pName, const WCHAR **pVers
     }
 
     return S_OK;
-}
-
-void AssFilter::ParseSrtLine(std::string &srtLine)
-{
-    // Replace srt styles to ass styles
-    FindReplace(srtLine, std::string("<b>"), std::string("{\\b1}"));
-    FindReplace(srtLine, std::string("</b>"), std::string("{\\b0}"));
-    FindReplace(srtLine, std::string("<i>"), std::string("{\\i1}"));
-    FindReplace(srtLine, std::string("</i>"), std::string("{\\i0}"));
-    FindReplace(srtLine, std::string("<u>"), std::string("{\\u1}"));
-    FindReplace(srtLine, std::string("</u>"), std::string("{\\u0}"));
-
-    // Check if there is a font color tag
-    char fntColor[7];
-    if (sscanf_s(srtLine.c_str(), "<font color=\"#%6s\">", &fntColor, (unsigned int)sizeof(fntColor)) > 0)
-    {
-        std::string fntStr = fntColor;
-        fntStr.insert(0, "<font color=\"#");
-        fntStr.append("\">");
-
-        // font color tag in srt is RGB and we need BGR
-        char tmpColor[7];
-        strcpy_s(tmpColor, sizeof(tmpColor), fntColor);
-        tmpColor[0] = fntColor[4];
-        tmpColor[1] = fntColor[5];
-        tmpColor[4] = fntColor[0];
-        tmpColor[5] = fntColor[1];
-        std::string assStr = "{\\1c&H";
-        assStr.append(tmpColor);
-        assStr.append("&}{\\3c&H");
-        assStr.append(tmpColor);
-        assStr.append("&}");
-        FindReplace(srtLine, fntStr, assStr);
-        FindReplace(srtLine, std::string("</font>"), std::string(""));
-    }
-
-    // Replace end-of-line(CR+LF) to ass style
-    FindReplace(srtLine, std::string("\r\n"), std::string("\\N"));
 }
 
 HRESULT AssFilter::LoadDefaults()

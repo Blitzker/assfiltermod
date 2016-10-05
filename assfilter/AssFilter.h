@@ -98,8 +98,6 @@ private:
         void operator()(ASS_Track* p);
     };
 
-    void ParseSrtLine(std::string &srtLine);
-
     HRESULT LoadDefaults();
     HRESULT ReadSettings(HKEY rootKey);
     HRESULT LoadSettings();
