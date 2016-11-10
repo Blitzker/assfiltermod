@@ -19,19 +19,8 @@
 
 #include "AssFilterSettings.h"
 
-// {DB4911BF-7703-4529-8D87-4CA3AAB837C5}
-DEFINE_GUID(CLSID_AssFilterSettingsProp,
-0xdb4911bf, 0x7703, 0x4529, 0x8d, 0x87, 0x4c, 0xa3, 0xaa, 0xb8, 0x37, 0xc5);
-
-// {FFF8BE53-6145-4D19-BD7E-4D7C57030389}
-DEFINE_GUID(CLSID_AssFilterStatusProp,
-0xfff8be53, 0x6145, 0x4d19, 0xbd, 0x7e, 0x4d, 0x7c, 0x57, 0x3, 0x3, 0x89);
-
-// {7077B783-80B2-4D7B-B9CD-C4EA21622B61}
-DEFINE_GUID(CLSID_AssFilterAboutProp,
-0x7077b783, 0x80b2, 0x4d7b, 0xb9, 0xcd, 0xc4, 0xea, 0x21, 0x62, 0x2b, 0x61);
-
-class CAssFilterSettingsProp : public CBasePropertyPage
+class __declspec(uuid("DB4911BF-7703-4529-8D87-4CA3AAB837C5"))
+CAssFilterSettingsProp : public CBasePropertyPage
 {
 private:
     IAssFilterSettings *m_pAssFilterSettings = nullptr; // Pointer to the filter's custom interface.
@@ -93,7 +82,8 @@ public:
 
 };
 
-class CAssFilterStatusProp : public CBasePropertyPage
+class __declspec(uuid("FFF8BE53-6145-4D19-BD7E-4D7C57030389"))
+CAssFilterStatusProp : public CBasePropertyPage
 {
 private:
     IAssFilterSettings *m_pAssFilterSettings = nullptr; // Pointer to the filter's custom interface.
@@ -121,7 +111,8 @@ public:
 
 };
 
-class CAssFilterAboutProp : public CBasePropertyPage
+class __declspec(uuid("7077B783-80B2-4D7B-B9CD-C4EA21622B61"))
+CAssFilterAboutProp : public CBasePropertyPage
 {
 private:
     IAssFilterSettings *m_pAssFilterSettings = nullptr; // Pointer to the filter's custom interface.

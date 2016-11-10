@@ -39,9 +39,9 @@ namespace
 
 CFactoryTemplate g_Templates[] = {
     { name, &__uuidof(AssFilter), AssFilter::CreateInstance, nullptr, &setupFilter },
-    { L"AssFilterSettingsProp", &CLSID_AssFilterSettingsProp, CAssFilterSettingsProp::CreateInstance, nullptr, nullptr },
-    { L"AssFilterStatusProp", &CLSID_AssFilterStatusProp, CAssFilterStatusProp::CreateInstance, nullptr, nullptr },
-    { L"AssFilterAboutProp", &CLSID_AssFilterAboutProp, CAssFilterAboutProp::CreateInstance, nullptr, nullptr }
+    { L"AssFilterSettingsProp", &__uuidof(CAssFilterSettingsProp), CAssFilterSettingsProp::CreateInstance, nullptr, nullptr },
+    { L"AssFilterStatusProp", &__uuidof(CAssFilterStatusProp), CAssFilterStatusProp::CreateInstance, nullptr, nullptr },
+    { L"AssFilterAboutProp", &__uuidof(CAssFilterAboutProp), CAssFilterAboutProp::CreateInstance, nullptr, nullptr }
 };
 
 int g_cTemplates = _countof(g_Templates);

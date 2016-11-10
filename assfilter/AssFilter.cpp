@@ -249,7 +249,7 @@ STDMETHODIMP AssFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
         return GetInterface(static_cast<ISpecifyPropertyPages*>(this), ppv);
     else if (riid == __uuidof(ISpecifyPropertyPages2))
         return GetInterface(static_cast<ISpecifyPropertyPages2*>(this), ppv);
-    else if (riid == IID_IAssFilterSettings)
+    else if (riid == __uuidof(IAssFilterSettings))
         return GetInterface(static_cast<IAssFilterSettings*>(this), ppv);
 
     return __super::NonDelegatingQueryInterface(riid, ppv);
@@ -506,9 +506,10 @@ STDMETHODIMP AssFilter::GetPages(CAUUID *pPages)
     {
         return E_OUTOFMEMORY;
     }
-    pPages->pElems[0] = CLSID_AssFilterSettingsProp;
-    pPages->pElems[1] = CLSID_AssFilterStatusProp;
-    pPages->pElems[2] = CLSID_AssFilterAboutProp;
+    pPages->pElems[0] = __uuidof(CAssFilterSettingsProp);
+    pPages->pElems[1] = __uuidof(CAssFilterStatusProp);
+    pPages->pElems[2] = __uuidof(CAssFilterAboutProp);
+
     return S_OK;
 }
 
@@ -522,11 +523,11 @@ STDMETHODIMP AssFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
     if (*ppPage != nullptr)
         return E_INVALIDARG;
 
-    if (guid == CLSID_AssFilterSettingsProp)
+    if (guid == __uuidof(CAssFilterSettingsProp))
         *ppPage = new CAssFilterSettingsProp(nullptr, &hr);
-    else if (guid == CLSID_AssFilterStatusProp)
+    else if (guid == __uuidof(CAssFilterStatusProp))
         *ppPage = new CAssFilterStatusProp(nullptr, &hr);
-    else if (guid == CLSID_AssFilterAboutProp)
+    else if (guid == __uuidof(CAssFilterAboutProp))
         *ppPage = new CAssFilterAboutProp(nullptr, &hr);
 
     if (SUCCEEDED(hr) && *ppPage)
