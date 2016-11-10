@@ -200,7 +200,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
                     m_settings.FontScaleX, m_settings.FontScaleY, m_settings.FontSpacing, m_settings.FontOutline, 
                     m_settings.FontShadow, m_settings.LineAlignment, m_settings.MarginLeft, m_settings.MarginRight, 
                     m_settings.MarginVertical);
-                ass_process_codec_private(m_track.get(), outBuffer, strnlen_s(outBuffer, sizeof(outBuffer)));
+                ass_process_codec_private(m_track.get(), outBuffer, static_cast<int>(strnlen_s(outBuffer, sizeof(outBuffer))));
                 m_bSrtHeaderDone = true;
             }
 
@@ -228,7 +228,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
             // ASS in MKV: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             char outBuffer[1024] {};
             _snprintf_s(outBuffer, _TRUNCATE, "%lld,0,Default,Main,0,0,0,,%s", m_iSubLineCount, str.c_str());
-            ass_process_chunk(m_track.get(), outBuffer, strnlen_s(outBuffer, sizeof(outBuffer)), tStart / 10000, (tStop - tStart) / 10000);
+            ass_process_chunk(m_track.get(), outBuffer, static_cast<int>(strnlen_s(outBuffer, sizeof(outBuffer))), tStart / 10000, (tStop - tStart) / 10000);
         }
         else
         {
