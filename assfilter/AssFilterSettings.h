@@ -17,6 +17,34 @@
 
 #pragma once
 
+ // Settings
+struct AssFSettings
+{
+    BOOL TrayIcon;
+
+    std::wstring FontName;
+    BOOL NativeSize;
+    DWORD FontSize;
+    DWORD FontScaleX;
+    DWORD FontScaleY;
+    DWORD FontSpacing;
+    DWORD FontBlur;
+    DWORD FontOutline;
+    DWORD FontShadow;
+    DWORD LineAlignment;
+    DWORD MarginLeft;
+    DWORD MarginRight;
+    DWORD MarginVertical;
+    DWORD ColorPrimary;
+    DWORD ColorSecondary;
+    DWORD ColorOutline;
+    DWORD ColorShadow;
+    DWORD CustomRes;
+
+    std::wstring CustomTags;
+    std::wstring ExtraFontsDir;
+};
+
 // AssFilter Settings Interface
 interface __declspec(uuid("2E277FB7-75C0-453C-A1ED-A6B6FD6F4728"))
 IAssFilterSettings : public IUnknown

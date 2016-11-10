@@ -20,6 +20,7 @@
 #include <ass.h>
 #include "AssFilterSettings.h"
 #include "ISpecifyPropertyPages2.h"
+#include "Tools.h"
 
 class AssPin;
 
@@ -114,31 +115,7 @@ private:
     std::map<std::string, bool> m_boolOptions;
 
     // Settings
-    struct AssFSettings
-    {
-        BOOL TrayIcon;
-
-        std::wstring FontName;
-        BOOL NativeSize;
-        DWORD FontSize;
-        DWORD FontScaleX;
-        DWORD FontScaleY;
-        DWORD FontSpacing;
-        DWORD FontBlur;
-        DWORD FontOutline;
-        DWORD FontShadow;
-        DWORD LineAlignment;
-        DWORD MarginLeft;
-        DWORD MarginRight;
-        DWORD MarginVertical;
-        DWORD ColorPrimary;
-        DWORD ColorSecondary;
-        DWORD ColorOutline;
-        DWORD ColorShadow;
-        DWORD CustomRes;
-
-        std::wstring CustomTags;
-    } m_settings;
+    AssFSettings    m_settings;
 
     // Test
     CCritSec        m_csShared;         // Protects shared data.

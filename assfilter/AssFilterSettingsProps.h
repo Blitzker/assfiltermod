@@ -18,6 +18,7 @@
 #pragma once
 
 #include "AssFilterSettings.h"
+#include "Tools.h"
 
 class __declspec(uuid("DB4911BF-7703-4529-8D87-4CA3AAB837C5"))
 CAssFilterSettingsProp : public CBasePropertyPage
@@ -27,31 +28,7 @@ private:
     COLORREF            m_acrCustClr[16];   // Custom colors
 
     // Settings
-    struct SrtSettings
-    {
-        BOOL TrayIcon;
-        BOOL NativeSize;
-
-        std::wstring FontName;
-        DWORD FontSize;
-        DWORD FontScaleX;
-        DWORD FontScaleY;
-        DWORD FontSpacing;
-        DWORD FontBlur;
-        DWORD FontOutline;
-        DWORD FontShadow;
-        DWORD LineAlignment;
-        DWORD MarginLeft;
-        DWORD MarginRight;
-        DWORD MarginVertical;
-        DWORD ColorPrimary;
-        DWORD ColorSecondary;
-        DWORD ColorOutline;
-        DWORD ColorShadow;
-        DWORD CustomRes;
-
-        std::wstring CustomTags;
-    } m_settings;
+    AssFSettings        m_settings;
 
     HRESULT LoadSettings();
     HRESULT LoadDefaults();
