@@ -88,10 +88,10 @@ void ParseSrtLine(std::string &srtLine, DWORD colorPrimary, DWORD colorOutline)
     _snprintf_s(origFontAssTag, _TRUNCATE, "{\\1c&H%6X&}{\\3c&H%6X&}", colorPrimary, colorOutline);
 
     // Check if there is a font color tag
-    for (int cnt = 0; cnt < vecSrtLines.size(); cnt++)
+    for (size_t cnt = 0; cnt < vecSrtLines.size(); cnt++)
     {
-        size_t found = vecSrtLines[cnt].find("<font color=");
-        if (found != std::string::npos)
+        size_t found; // = vecSrtLines[cnt].find("<font color=");
+        while ((found = vecSrtLines[cnt].find("<font color=")) != std::string::npos)
         {
             std::string fntStr;         // Hold the full font color HTML tag
             char fntColor[100]{};       // Hold the color data
