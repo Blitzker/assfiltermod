@@ -70,9 +70,73 @@ static const struct s_color_tag {
     { "yellow",         "FFFF00" },
 };
 
+static const struct s_iso639_lang {
+    const char *language;
+    const char *lang3;
+    const char *lang2;
+} iso639_lang[] = {
+    { "Albanian",               "alb", "sq" },
+    { "Arabic",                 "ara", "ar" },
+    { "Armenian",               "arm", "hy" },
+    { "Basque",                 "baq", "eu" },
+    { "Belarusian",             "bel", "be" },
+    { "Bosnian",                "bos", "bs" },
+    { "Bulgarian",              "bul", "bg" },
+    { "Catalan",                "cat", "ca" },
+    { "Chinese",                "chi", "zh" },
+    { "Croatian",               "hrv", "hr" },
+    { "Czech",                  "cze", "cs" },
+    { "Danish",                 "dan", "da" },
+    { "Dutch",                  "dut", "nl" },
+    { "English",                "eng", "en" },
+    { "Finnish",                "fin", "fi" },
+    { "French",                 "fre", "fr" },
+    { "Georgian",               "geo", "ka" },
+    { "German",                 "ger", "de" },
+    { "Greek",                  "gre", "el" },
+    { "Haitian",                "hat", "ht" },
+    { "Hebrew",                 "heb", "he" },
+    { "Hungarian",              "hun", "hu" },
+    { "Indonesian",             "ind", "id" },
+    { "Irish",                  "gle", "ga" },
+    { "Italian",                "ita", "it" },
+    { "Japanese",               "jpn", "ja" },
+    { "Korean",                 "kor", "ko" },
+    { "Kurdish",                "kur", "ku" },
+    { "Lao",                    "lao", "lo" },
+    { "Latin",                  "lat", "la" },
+    { "Lithuanian",             "lit", "lt" },
+    { "Macedonian",             "mac", "mk" },
+    { "Malay",                  "may", "ms" },
+    { "Malayalam",              "mal", "ml" },
+    { "Maltese",                "mlt", "mt" },
+    { "Mongolian",              "mon", "mn" },
+    { "Norwegian",              "nor", "no" },
+    { "Persian",                "per", "fa" },
+    { "Polish",                 "pol", "pl" },
+    { "Portuguese",             "por", "pt" },
+    { "Romanian",               "rum", "ro" },
+    { "Russian",                "rus", "ru" },
+    { "Serbian",                "srp", "sr" },
+    { "Slovak",                 "slo", "sk" },
+    { "Slovenian",              "slv", "sl" },
+    { "Somali",                 "som", "so" },
+    { "Spanish",                "spa", "es" },
+    { "Swedish",                "swe", "sv" },
+    { "Thai",                   "tha", "th" },
+    { "Tibetan",                "tib", "bo" },
+    { "Turkish",                "tur", "tr" },
+    { "Ukrainian",              "ukr", "uk" },
+    { "Undetermined",           "und", "ud" },
+    { "Vietnamese",             "vie", "vi" },
+    { "Zhuang",                 "zha", "za" },
+
+};
+
 void FindReplace(std::string& line, std::string& oldString, std::string& newString);
 std::wstring s2ws(const std::string& str);
 std::string ws2s(const std::wstring& wstr);
 
 void ParseSrtLine(std::string &srtLine, DWORD colorPrimary, DWORD colorOutline);
 void MatchColorSrt(char *fntColor, size_t size);
+std::string MatchLanguage(std::string& langCode, bool isCode2Chars = false);

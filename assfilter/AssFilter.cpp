@@ -100,7 +100,7 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     auto psi = reinterpret_cast<const SUBTITLEINFO*>(mt.Format());
 
     m_wsTrackName.assign(psi->TrackName);
-    m_sTrackLang.assign(psi->IsoLang);
+    m_sTrackLang.assign(MatchLanguage(std::string(psi->IsoLang)) + " (" + std::string(psi->IsoLang) + ")");
     m_sSubType.assign("ASS");
 
     // SRT Stuff

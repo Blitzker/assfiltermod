@@ -154,3 +154,18 @@ void MatchColorSrt(char *fntColor, size_t size)
             strcpy_s(fntColor, size, "FFFFFF");
     }
 }
+
+std::string MatchLanguage(std::string& langCode, bool isCode2Chars)
+{
+    for (int i = 0; i < _countof(iso639_lang); i++)
+    {
+        if (strcmp(langCode.c_str(), isCode2Chars ? iso639_lang[i].lang2 : iso639_lang[i].lang3) == 0)
+            return std::string(iso639_lang[i].language);
+
+        // Language unknown
+        if (i == _countof(iso639_lang) - 1)
+            return std::string("Unknown");
+    }
+
+    return std::string("ERROR!!!");
+}
