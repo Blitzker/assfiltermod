@@ -17,6 +17,7 @@
 
 #include "stdafx.h"
 #include "SubFrame.h"
+#include <ppl.h>
 
 namespace
 {
@@ -107,7 +108,7 @@ void SubFrame::Flatten(ASS_Image* image)
 
         for (auto i = image; i != nullptr; i = i->next)
         {
-            for (int y = 0; y < i->h; y++)
+            concurrency::parallel_for(0, i->h, [&](int y)
             {
                 for (int x = 0; x < i->w; x++)
                 {
@@ -132,7 +133,7 @@ void SubFrame::Flatten(ASS_Image* image)
 
                     dest = (outA << 24) + (outR & 0x00ff0000) + (outG & 0x0000ff00) + (outB & 0x000000ff);
                 }
-            }
+            }, concurrency::static_partitioner());
         }
     }
 }
