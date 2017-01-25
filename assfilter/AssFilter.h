@@ -124,4 +124,6 @@ private:
     std::wstring    m_wsTrackLang;      // Subtitle track language.
     std::wstring    m_wsSubType;        // Subtitle track type (ASS or SRT)
     REFERENCE_TIME  m_iSubLineCount;    // Subtitle line number id
+    std::wstring    m_wsConsumerName;   // Consumer name
+    std::wstring    m_wsConsumerVer;    // Consumer version
 };

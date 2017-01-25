@@ -288,6 +288,17 @@ STDMETHODIMP AssFilter::Pause()
                     DbgLog((LOG_TRACE, 1, L"AssFilter::Pause() -> Connected to consumer"));
                     m_consumer = consumer;
                     m_consumerLastId = 0;
+
+                    LPWSTR cName;
+                    int cChars;
+
+                    m_consumer->GetString("name", &cName, &cChars);
+                    m_wsConsumerName.assign(cName);
+                    LocalFree(cName);
+
+                    m_consumer->GetString("version", &cName, &cChars);
+                    m_wsConsumerVer.assign(cName);
+                    LocalFree(cName);
                 }
             }
         }
@@ -558,31 +569,11 @@ STDMETHODIMP AssFilter::GetTrackInfo(const WCHAR **pTrackName, const WCHAR **pTr
 
 STDMETHODIMP AssFilter::GetConsumerInfo(const WCHAR **pName, const WCHAR **pVersion)
 {
-    CheckPointer(m_consumer, E_UNEXPECTED);
-    if (!m_pin || m_pin->IsConnected() == FALSE)
-    {
-        return E_UNEXPECTED;
-    }
-
     if (pName)
-    {
-        LPWSTR cName;
-        int cChars;
-
-        m_consumer->GetString("name", &cName, &cChars);
-        *pName = cName;
-        //LocalFree(cName);
-    }
+        *pName = m_wsConsumerName.c_str();
 
     if (pVersion)
-    {
-        LPWSTR cVersion;
-        int cChars;
-
-        m_consumer->GetString("version", &cVersion, &cChars);
-        *pVersion = cVersion;
-        //LocalFree(cVersion);
-    }
+        *pVersion = m_wsConsumerVer.c_str();
 
     return S_OK;
 }
