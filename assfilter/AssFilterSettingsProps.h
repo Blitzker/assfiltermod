@@ -25,7 +25,7 @@ CAssFilterSettingsProp : public CBasePropertyPage
 {
 private:
     IAssFilterSettings *m_pAssFilterSettings = nullptr; // Pointer to the filter's custom interface.
-    COLORREF            m_acrCustClr[16];   // Custom colors
+    COLORREF            m_acrCustClr[16];               // Custom colors
 
     // Settings
     AssFSettings        m_settings;
