@@ -1052,18 +1052,15 @@ HRESULT CAssFilterStatusProp::OnActivate(void)
     ASSERT(m_pAssFilterSettings != nullptr);
 
     const WCHAR *trackname = nullptr;
-    const char *tracklang = nullptr;
-    const char *subtype = nullptr;
+    const WCHAR *tracklang = nullptr;
+    const WCHAR *subtype = nullptr;
 
     hr = m_pAssFilterSettings->GetTrackInfo(&trackname, &tracklang, &subtype);
     if (SUCCEEDED(hr))
     {
         SendDlgItemMessage(m_Dlg, IDC_TEST1, WM_SETTEXT, 0, (LPARAM)trackname);
-        WCHAR buffer[100];
-        _snwprintf_s(buffer, _TRUNCATE, L"%S", tracklang);
-        SendDlgItemMessage(m_Dlg, IDC_TEST2, WM_SETTEXT, 0, (LPARAM)buffer);
-        _snwprintf_s(buffer, _TRUNCATE, L"%S", subtype);
-        SendDlgItemMessage(m_Dlg, IDC_TEST3, WM_SETTEXT, 0, (LPARAM)buffer);
+        SendDlgItemMessage(m_Dlg, IDC_TEST2, WM_SETTEXT, 0, (LPARAM)tracklang);
+        SendDlgItemMessage(m_Dlg, IDC_TEST3, WM_SETTEXT, 0, (LPARAM)subtype);
     }
 
     const WCHAR *consumername = nullptr;

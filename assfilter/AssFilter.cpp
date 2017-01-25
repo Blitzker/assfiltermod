@@ -100,14 +100,14 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     auto psi = reinterpret_cast<const SUBTITLEINFO*>(mt.Format());
 
     m_wsTrackName.assign(psi->TrackName);
-    m_sTrackLang.assign(MatchLanguage(std::string(psi->IsoLang)) + " (" + std::string(psi->IsoLang) + ")");
-    m_sSubType.assign("ASS");
+    m_wsTrackLang.assign(s2ws(MatchLanguage(std::string(psi->IsoLang)) + " (" + std::string(psi->IsoLang) + ")"));
+    m_wsSubType.assign(L"ASS");
 
     // SRT Stuff
     if (mt.subtype == MEDIASUBTYPE_UTF8)
     {
         DbgLog((LOG_TRACE, 1, L"AssFilter::SetMediaType() -> SRT Mode"));
-        m_sSubType.assign("SRT");
+        m_wsSubType.assign(L"SRT");
 
         m_bSrtHeaderDone = false;
         m_boolOptions["isMovable"] = true;
@@ -170,7 +170,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
         tStart += tSegmentStart;
         tStop += tSegmentStart;
 
-        if (m_sSubType == "SRT")
+        if (m_wsSubType == L"SRT")
         {
             // Send the codec private data
             if (!m_bSrtHeaderDone)
@@ -542,21 +542,16 @@ STDMETHODIMP AssFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
     }
 }
 
-STDMETHODIMP AssFilter::GetTrackInfo(const WCHAR **pTrackName, const char **pTrackLang, const char **pSubType)
+STDMETHODIMP AssFilter::GetTrackInfo(const WCHAR **pTrackName, const WCHAR **pTrackLang, const WCHAR **pSubType)
 {
-    if (!m_pin || m_pin->IsConnected() == FALSE)
-    {
-        return E_UNEXPECTED;
-    }
-
     if (pTrackName)
         *pTrackName = m_wsTrackName.c_str();
 
     if (pTrackLang)
-        *pTrackLang = m_sTrackLang.c_str();
+        *pTrackLang = m_wsTrackLang.c_str();
 
     if (pSubType)
-        *pSubType = m_sSubType.c_str();
+        *pSubType = m_wsSubType.c_str();
 
     return S_OK;
 }

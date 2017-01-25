@@ -50,7 +50,7 @@ interface __declspec(uuid("2E277FB7-75C0-453C-A1ED-A6B6FD6F4728"))
 IAssFilterSettings : public IUnknown
 {
     // Get the current subtitle track name and language
-    STDMETHOD(GetTrackInfo)(LPCWSTR *pTrackName, LPCSTR *pTrackLang, LPCSTR *pSubType) = 0;
+    STDMETHOD(GetTrackInfo)(LPCWSTR *pTrackName, LPCWSTR *pTrackLang, LPCWSTR *pSubType) = 0;
 
     // Get info from the consumer
     STDMETHOD(GetConsumerInfo)(LPCWSTR *pName, LPCWSTR *pVersion) = 0;

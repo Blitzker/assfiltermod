@@ -79,7 +79,7 @@ public:
     STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage) override;
 
     // IAssFilterSettings
-    STDMETHODIMP GetTrackInfo(const WCHAR **pTrackName, const char **pTrackLang, const char **pSubType) override;
+    STDMETHODIMP GetTrackInfo(const WCHAR **pTrackName, const WCHAR **pTrackLang, const WCHAR **pSubType) override;
     STDMETHODIMP GetConsumerInfo(const WCHAR **pName, const WCHAR **pVersion) override;
 
 private:
@@ -121,7 +121,7 @@ private:
     CCritSec        m_csShared;         // Protects shared data.
     bool            m_bSrtHeaderDone;   // Is the private codec data already sent?
     std::wstring    m_wsTrackName;      // Subtitle track name.
-    std::string     m_sTrackLang;       // Subtitle track language.
-    std::string     m_sSubType;         // Subtitle track type (ASS or SRT)
+    std::wstring    m_wsTrackLang;      // Subtitle track language.
+    std::wstring    m_wsSubType;        // Subtitle track type (ASS or SRT)
     REFERENCE_TIME  m_iSubLineCount;    // Subtitle line number id
 };
