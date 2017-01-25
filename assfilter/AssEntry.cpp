@@ -25,11 +25,14 @@ namespace
 
     const AMOVIESETUP_MEDIATYPE pinTypes[] = {
         { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_ASS },
-        { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_UTF8 }
+        { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_UTF8 },
+        { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_SSA },
+        { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_VOBSUB },
+        { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_HDMVSUB },
     };
 
     const AMOVIESETUP_PIN setupPin = {
-        L"", TRUE, FALSE, TRUE, TRUE, &CLSID_NULL, nullptr, _countof(pinTypes), pinTypes
+        L"Input", TRUE, FALSE, TRUE, TRUE, &CLSID_NULL, nullptr, _countof(pinTypes), pinTypes
     };
 
     const AMOVIESETUP_FILTER setupFilter = {

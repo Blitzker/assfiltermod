@@ -120,6 +120,7 @@ private:
     // Test
     CCritSec        m_csShared;         // Protects shared data.
     bool            m_bSrtHeaderDone;   // Is the private codec data already sent?
+    bool            m_bUnsupportedSub;  // Sub is not supported
     std::wstring    m_wsTrackName;      // Subtitle track name.
     std::wstring    m_wsTrackLang;      // Subtitle track language.
     std::wstring    m_wsSubType;        // Subtitle track type (ASS or SRT)

@@ -21,31 +21,46 @@
 #include "AssFilter.h"
 
 AssPin::AssPin(AssFilter* pFilter, HRESULT* pResult)
-    : CBaseInputPin("", pFilter, this, pResult, L"Input0")
+    : CBaseInputPin(NAME("AssPin"), pFilter, this, pResult, L"Input")
     , m_pAssFilter(pFilter)
 {
+    DbgLog((LOG_TRACE, 1, L"AssPin::AssPin -> Pin created!"));
 }
 
 HRESULT AssPin::CheckMediaType(const CMediaType* pmt)
 {
     CheckPointer(pmt, E_POINTER);
 
-    // Check if the request is for ASS
+    CAutoLock lock(this);
+
+    // Check if the request is for ASS or SSA
     if (pmt->majortype == MEDIATYPE_Subtitle &&
-        pmt->subtype == MEDIASUBTYPE_ASS &&
+        (pmt->subtype == MEDIASUBTYPE_ASS || pmt->subtype == MEDIASUBTYPE_SSA) &&
         pmt->formattype == FORMAT_SubtitleInfo)
     {
+        DbgLog((LOG_TRACE, 1, L"AssPin::CheckMediaType -> MEDIASUBTYPE_ASS_SSA"));
         return S_OK;
     }
 
-    // Check if the request is for SRT (TODO)
+    // Check if the request is for SRT
     if (pmt->majortype == MEDIATYPE_Subtitle &&
         pmt->subtype == MEDIASUBTYPE_UTF8 &&
         pmt->formattype == FORMAT_SubtitleInfo)
     {
-        DbgLog((LOG_TRACE, 1, L"AssPin::CheckMediaType -> Trying SRT"));
+        DbgLog((LOG_TRACE, 1, L"AssPin::CheckMediaType -> MEDIASUBTYPE_UTF8"));
         return S_OK;
     }
+
+    // Check if the request is for VOBSUB or HDMVSUB
+    if (pmt->majortype == MEDIATYPE_Subtitle &&
+        (pmt->subtype == MEDIASUBTYPE_VOBSUB || pmt->subtype == MEDIASUBTYPE_HDMVSUB) &&
+        pmt->formattype == FORMAT_SubtitleInfo)
+    {
+        DbgLog((LOG_TRACE, 1, L"AssPin::CheckMediaType -> MEDIASUBTYPE_VOBSUB_HDMVSUB"));
+        return S_OK;
+    }
+
+    DbgLog((LOG_TRACE, 1, L"AssPin::CheckMediaType -> Unsupported MEDIATYPE"));
 
     return S_FALSE;
 }

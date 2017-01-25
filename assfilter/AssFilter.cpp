@@ -42,6 +42,7 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_boolOptions["isMovable"] = false;
 
     m_bSrtHeaderDone = false;
+    m_bUnsupportedSub = false;
 
     LoadSettings();
 
@@ -114,7 +115,7 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     m_wsTrackLang.assign(s2ws(MatchLanguage(std::string(psi->IsoLang)) + " (" + std::string(psi->IsoLang) + ")"));
     m_wsSubType.assign(L"ASS");
 
-    // SRT Stuff
+    // SRT Media Sub-Type
     if (mt.subtype == MEDIASUBTYPE_UTF8)
     {
         DbgLog((LOG_TRACE, 1, L"AssFilter::SetMediaType() -> SRT Mode"));
@@ -122,11 +123,32 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
 
         m_bSrtHeaderDone = false;
         m_boolOptions["isMovable"] = true;
+        m_bUnsupportedSub = false;
     }
-    else
+    // ASS Media Sub-Type
+    else if (mt.subtype == MEDIASUBTYPE_ASS || mt.subtype == MEDIASUBTYPE_SSA)
     {
         m_boolOptions["isMovable"] = false;
+        m_bUnsupportedSub = false;
         ass_process_codec_private(m_track.get(), (char*)mt.Format() + psi->dwOffset, mt.FormatLength() - psi->dwOffset);
+    }
+    // VobSub Media Sub-Type (NOT SUPPORTED)
+    else if (mt.subtype == MEDIASUBTYPE_VOBSUB)
+    {
+        m_track = decltype(m_track)(ass_new_track(m_ass.get()));
+        m_wsTrackName.assign(L"Not supported!");
+        m_wsSubType.assign(L"VOBSUB");
+        m_stringOptions["yuvMatrix"] = L"None";
+        m_bUnsupportedSub = true;
+    }
+    // PGS Media Sub-Type (NOT SUPPORTED)
+    else if (mt.subtype == MEDIASUBTYPE_HDMVSUB)
+    {
+        m_track = decltype(m_track)(ass_new_track(m_ass.get()));
+        m_wsTrackName.assign(L"Not supported!");
+        m_wsSubType.assign(L"PGS");
+        m_stringOptions["yuvMatrix"] = L"None";
+        m_bUnsupportedSub = true;
     }
 
     // If a track already exist, return cuz we don't need to allocate the fonts again.
@@ -167,7 +189,9 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
 
 void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
 {
-    // TODO: resolve a race with RequestFrame()
+    if (m_bUnsupportedSub)
+        return;
+
     DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() tSegmentStart: %I64d", tSegmentStart));
 
     REFERENCE_TIME tStart, tStop;
