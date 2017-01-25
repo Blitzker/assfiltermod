@@ -200,7 +200,7 @@ HRESULT CAssFilterSettingsProp::OnApplyChanges(void)
         m_settings.FontName.assign(L"Arial");
 
     if (m_settings.FontSize == 0 || m_settings.FontSize > 200)
-        m_settings.FontSize = 50;
+        m_settings.FontSize = 18;
 
     WCHAR wsBuffer[10];
     SendDlgItemMessage(m_Dlg, IDC_EDIT1, WM_GETTEXT, 10, (LPARAM)&wsBuffer);
@@ -377,6 +377,12 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
         dwVal = reg.ReadDWORD(L"CustomRes", hr);
         if (SUCCEEDED(hr)) m_settings.CustomRes = dwVal;
 
+        dwVal = reg.ReadDWORD(L"SrtResX", hr);
+        if (SUCCEEDED(hr)) m_settings.SrtResX = dwVal;
+
+        dwVal = reg.ReadDWORD(L"SrtResY", hr);
+        if (SUCCEEDED(hr)) m_settings.SrtResY = dwVal;
+
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
     }
@@ -390,23 +396,25 @@ HRESULT CAssFilterSettingsProp::LoadDefaults()
     m_settings.NativeSize = FALSE;
 
     m_settings.FontName = L"Arial";
-    m_settings.FontSize = 50;
+    m_settings.FontSize = 18;
     m_settings.FontScaleX = 100;
     m_settings.FontScaleY = 100;
     m_settings.FontSpacing = 0;
     m_settings.FontBlur = 0;
 
     m_settings.FontOutline = 2;
-    m_settings.FontShadow = 0;
+    m_settings.FontShadow = 3;
     m_settings.LineAlignment = 2;
-    m_settings.MarginLeft = 120;
-    m_settings.MarginRight = 120;
-    m_settings.MarginVertical = 20;
+    m_settings.MarginLeft = 20;
+    m_settings.MarginRight = 20;
+    m_settings.MarginVertical = 10;
     m_settings.ColorPrimary = 0x00FFFFFF;
     m_settings.ColorSecondary = 0x00FFFF;
     m_settings.ColorOutline = 0;
-    m_settings.ColorShadow = 0;
+    m_settings.ColorShadow = 0x7F000000;
     m_settings.CustomRes = 0;
+    m_settings.SrtResX = 1920;
+    m_settings.SrtResY = 1080;
 
     m_settings.CustomTags = L"";
 
@@ -490,6 +498,8 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
         reg.WriteDWORD(L"ColorOutline", m_settings.ColorOutline);
         reg.WriteDWORD(L"ColorShadow", m_settings.ColorShadow);
         reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
+        reg.WriteDWORD(L"SrtResX", m_settings.SrtResX);
+        reg.WriteDWORD(L"SrtResY", m_settings.SrtResY);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
     }
 

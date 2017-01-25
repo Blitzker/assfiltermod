@@ -211,6 +211,8 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
             if (!m_bSrtHeaderDone)
             {
                 char outBuffer[1024] {};
+                double resx = m_settings.SrtResX / 384.0;
+                double resy = m_settings.SrtResY / 288.0;
 
                 // Generate a standard ass header
                 _snprintf_s(outBuffer, _TRUNCATE, "[Script Info]\n"
@@ -219,10 +221,9 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
                     "ScriptType: v4.00+\n"
                     "WrapStyle: 0\n"
                     "ScaledBorderAndShadow: yes\n"
-                    "YCbCr Matrix: TV.601\n"
-                    "PlayResX: 1280\n"
-                    "PlayResY: 720\n"
-                    "Video Aspect Ratio: c1.777778\n\n"
+                    "YCbCr Matrix: TV.709\n"
+                    "PlayResX: %u\n"
+                    "PlayResY: %u\n"
                     "[V4+ Styles]\n"
                     "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, "
                     "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, "
@@ -230,11 +231,12 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
                     "Style: Default,%s,%u,&H%X,&H%X,&H%X,&H%X,0,0,0,0,%u,%u,%u,0,1,%u,%u,%u,%u,%u,%u,1"
                     "\n\n[Events]\n"
                     "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n\n",
-                    ws2s(m_settings.FontName).c_str(), m_settings.FontSize, m_settings.ColorPrimary,
+                    m_settings.SrtResX, m_settings.SrtResY,
+                    ws2s(m_settings.FontName).c_str(), (int)std::round(m_settings.FontSize * resy), m_settings.ColorPrimary,
                     m_settings.ColorSecondary, m_settings.ColorOutline, m_settings.ColorShadow, 
                     m_settings.FontScaleX, m_settings.FontScaleY, m_settings.FontSpacing, m_settings.FontOutline, 
-                    m_settings.FontShadow, m_settings.LineAlignment, m_settings.MarginLeft, m_settings.MarginRight, 
-                    m_settings.MarginVertical);
+                    m_settings.FontShadow, m_settings.LineAlignment, (int)std::round(m_settings.MarginLeft * resx),
+                    (int)std::round(m_settings.MarginRight * resx), (int)std::round(m_settings.MarginVertical * resy));
                 ass_process_codec_private(m_track.get(), outBuffer, static_cast<int>(strnlen_s(outBuffer, sizeof(outBuffer))));
                 m_bSrtHeaderDone = true;
             }
@@ -250,7 +252,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
             m_iSubLineCount = tStart / 10000;
 
             // Change srt tags to ass tags
-            ParseSrtLine(str, m_settings.ColorPrimary, m_settings.ColorOutline);
+            ParseSrtLine(str, m_settings);
 
             // Add the custom tags
             str.insert(0, ws2s(m_settings.CustomTags));
@@ -662,23 +664,25 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.NativeSize = FALSE;
 
     m_settings.FontName = L"Arial";
-    m_settings.FontSize = 50;
+    m_settings.FontSize = 18;
     m_settings.FontScaleX = 100;
     m_settings.FontScaleY = 100;
     m_settings.FontSpacing = 0;
     m_settings.FontBlur = 0;
 
     m_settings.FontOutline = 2;
-    m_settings.FontShadow = 0;
+    m_settings.FontShadow = 3;
     m_settings.LineAlignment = 2;
-    m_settings.MarginLeft = 120;
-    m_settings.MarginRight = 120;
-    m_settings.MarginVertical = 20;
+    m_settings.MarginLeft = 20;
+    m_settings.MarginRight = 20;
+    m_settings.MarginVertical = 10;
     m_settings.ColorPrimary = 0x00FFFFFF;
     m_settings.ColorSecondary = 0x00FFFF;
     m_settings.ColorOutline = 0;
-    m_settings.ColorShadow = 0;
+    m_settings.ColorShadow = 0x7F000000;
     m_settings.CustomRes = 0;
+    m_settings.SrtResX = 1920;
+    m_settings.SrtResY = 1080;
 
     m_settings.CustomTags = L"";
 
@@ -752,6 +756,12 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
         dwVal = reg.ReadDWORD(L"CustomRes", hr);
         if (SUCCEEDED(hr)) m_settings.CustomRes = dwVal;
 
+        dwVal = reg.ReadDWORD(L"SrtResX", hr);
+        if (SUCCEEDED(hr)) m_settings.SrtResX = dwVal;
+
+        dwVal = reg.ReadDWORD(L"SrtResY", hr);
+        if (SUCCEEDED(hr)) m_settings.SrtResY = dwVal;
+
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
     }
@@ -795,6 +805,8 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteDWORD(L"ColorOutline", m_settings.ColorOutline);
         reg.WriteDWORD(L"ColorShadow", m_settings.ColorShadow);
         reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
+        reg.WriteDWORD(L"SrtResX", m_settings.SrtResX);
+        reg.WriteDWORD(L"SrtResY", m_settings.SrtResY);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
     }
 

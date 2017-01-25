@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <string>
+#include "AssFilterSettings.h"
 
 static const struct s_color_tag {
     const char *color;
@@ -137,6 +137,19 @@ void FindReplace(std::string& line, std::string& oldString, std::string& newStri
 std::wstring s2ws(const std::string& str);
 std::string ws2s(const std::wstring& wstr);
 
-void ParseSrtLine(std::string &srtLine, DWORD colorPrimary, DWORD colorOutline);
-void MatchColorSrt(char *fntColor, size_t size);
+std::string ConsumeAttribute(const char** ppsz_subtitle, std::string& attribute_value);
+std::string GetTag(const char** line, bool b_closing);
+bool IsClosed(const char* psz_subtitle, const char* psz_tagname);
+void ParseSrtLine(std::string& srtLine, const AssFSettings& settings);
+void MatchColorSrt(std::string& fntColor);
 std::string MatchLanguage(std::string& langCode, bool isCode2Chars = false);
+
+inline void swapRGBtoBGR(std::string& color)
+{
+    std::string tmp = color;
+
+    color[0] = tmp[4];
+    color[1] = tmp[5];
+    color[4] = tmp[0];
+    color[5] = tmp[1];
+}

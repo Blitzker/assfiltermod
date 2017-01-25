@@ -17,7 +17,9 @@
 
 #include "stdafx.h"
 
+#include <algorithm>
 #include <codecvt>
+#include <Shlwapi.h>
 #include "Tools.h"
 
 // Find(oldString) and replace(newString) in a string(line)
@@ -64,94 +66,380 @@ std::string ws2s(const std::wstring& wstr)
     return converterX.to_bytes(wstr);
 }
 
-void ParseSrtLine(std::string &srtLine, DWORD colorPrimary, DWORD colorOutline)
+std::string ConsumeAttribute(const char** ppsz_subtitle, std::string& attribute_value)
 {
-    // Replace srt styles to ass styles
-    FindReplace(srtLine, std::string("<b>"), std::string("{\\b1}"));
-    FindReplace(srtLine, std::string("</b>"), std::string("{\\b0}"));
-    FindReplace(srtLine, std::string("<i>"), std::string("{\\i1}"));
-    FindReplace(srtLine, std::string("</i>"), std::string("{\\i0}"));
-    FindReplace(srtLine, std::string("<u>"), std::string("{\\u1}"));
-    FindReplace(srtLine, std::string("</u>"), std::string("{\\u0}"));
+    const char* psz_subtitle = *ppsz_subtitle;
+    char psz_attribute_name[BUFSIZ];
+    char psz_attribute_value[BUFSIZ];
 
-    // Split the string at every LF (\n)
-    std::vector<std::string> vecSrtLines;
-    std::istringstream f(srtLine);
-    std::string strTmp;
-    while (std::getline(f, strTmp))
-        vecSrtLines.push_back(strTmp);
+    while (*psz_subtitle == ' ')
+        psz_subtitle++;
 
-    srtLine.clear();
+    size_t attr_len = 0;
+    char delimiter;
 
-    // Default font color
-    char origFontAssTag[1024]{};
-    _snprintf_s(origFontAssTag, _TRUNCATE, "{\\1c&H%6X&}{\\3c&H%6X&}", colorPrimary, colorOutline);
-
-    // Check if there is a font color tag
-    for (size_t cnt = 0; cnt < vecSrtLines.size(); cnt++)
+    while (*psz_subtitle && isalpha(*psz_subtitle))
     {
-        size_t found; // = vecSrtLines[cnt].find("<font color=");
-        while ((found = vecSrtLines[cnt].find("<font color=")) != std::string::npos)
+        psz_subtitle++;
+        attr_len++;
+    }
+
+    if (!*psz_subtitle || attr_len == 0)
+        return std::string();
+
+    strncpy_s(psz_attribute_name, psz_subtitle - attr_len, attr_len);
+    psz_attribute_name[attr_len] = 0;
+
+    // Skip over to the attribute value
+    while (*psz_subtitle && *psz_subtitle != '=')
+        psz_subtitle++;
+
+    // Skip the '=' sign
+    psz_subtitle++;
+
+    // Aknowledge the delimiter if any
+    while (*psz_subtitle && isspace(*psz_subtitle))
+        psz_subtitle++;
+
+    if (*psz_subtitle == '\'' || *psz_subtitle == '"')
+    {
+        // Save the delimiter and skip it
+        delimiter = *psz_subtitle;
+        psz_subtitle++;
+    }
+    else
+        delimiter = 0;
+
+    // Skip spaces, just in case
+    while (*psz_subtitle && isspace(*psz_subtitle))
+        psz_subtitle++;
+
+    // Skip the first #
+    if (*psz_subtitle == '#')
+        psz_subtitle++;
+
+    attr_len = 0;
+    while (*psz_subtitle && ((delimiter != 0 && *psz_subtitle != delimiter) ||
+        (delimiter == 0 && (isalnum(*psz_subtitle) || *psz_subtitle == '#'))))
+    {
+        psz_subtitle++;
+        attr_len++;
+    }
+
+    strncpy_s(psz_attribute_value, psz_subtitle - attr_len, attr_len);
+    psz_attribute_value[attr_len] = 0;
+    attribute_value.assign(psz_attribute_value);
+
+    // Finally, skip over the final delimiter
+    if (delimiter != 0 && *psz_subtitle)
+        psz_subtitle++;
+
+    *ppsz_subtitle = psz_subtitle;
+
+    return std::string(psz_attribute_name);
+}
+
+std::string GetTag(const char** line, bool b_closing)
+{
+    const char* psz_subtitle = *line;
+
+    if (*psz_subtitle != '<')
+        return std::string();
+
+    // Skip the '<'
+    psz_subtitle++;
+
+    if (b_closing && *psz_subtitle == '/')
+        psz_subtitle++;
+
+    // Skip potential spaces
+    while (*psz_subtitle == ' ')
+        psz_subtitle++;
+
+    // Now we need to verify if what comes next is a valid tag:
+    if (!isalpha(*psz_subtitle))
+        return std::string();
+
+    size_t tag_size = 1;
+    while (isalnum(psz_subtitle[tag_size]) || psz_subtitle[tag_size] == '_')
+        tag_size++;
+
+    char psz_tagname[BUFSIZ];
+    strncpy_s(psz_tagname, psz_subtitle, tag_size);
+    psz_tagname[tag_size] = 0;
+    psz_subtitle += tag_size;
+    *line = psz_subtitle;
+
+    return std::string(psz_tagname);
+}
+
+bool IsClosed(const char* psz_subtitle, const char* psz_tagname)
+{
+    const char* psz_tagpos = StrStrIA(psz_subtitle, psz_tagname);
+
+    if (!psz_tagpos)
+        return false;
+
+    // Search for '</' and '>' immediatly before & after (minding the potential spaces)
+    const char* psz_endtag = psz_tagpos + strlen(psz_tagname);
+
+    while (*psz_endtag == ' ')
+        psz_endtag++;
+
+    if (*psz_endtag != '>')
+        return false;
+
+    // Skip back before the tag itself
+    psz_tagpos--;
+    while (*psz_tagpos == ' ' && psz_tagpos > psz_subtitle)
+        psz_tagpos--;
+
+    if (*psz_tagpos-- != '/')
+        return false;
+
+    if (*psz_tagpos != '<')
+        return false;
+
+    return true;
+}
+
+void ParseSrtLine(std::string& srtLine, const AssFSettings& settings)
+{
+    const char *psz_subtitle = srtLine.data();
+    std::string subtitle_output;
+
+    while (*psz_subtitle)
+    {
+        /* HTML extensions */
+        if (*psz_subtitle == '<')
         {
-            std::string fntStr;         // Hold the full font color HTML tag
-            char fntColor[100]{};       // Hold the color data
-                                        // Look for hex color tag starting with # between quotes
-            if (vecSrtLines[cnt].find("<font color=\"#") != std::string::npos)
+            std::string tagname = GetTag(&psz_subtitle, false);
+            if (!tagname.empty())
             {
-                fntStr = vecSrtLines[cnt].substr(found);
-                sscanf_s(fntStr.c_str(), "<font color=\"#%6s\">", &fntColor, (unsigned int)sizeof(fntColor));
-                fntStr = fntColor;
-                fntStr.insert(0, "<font color=\"#").append("\">");
+                // Convert tagname to lowercase
+                std::transform(tagname.begin(), tagname.end(), tagname.begin(), ::tolower);
+                if (tagname == "br")
+                {
+                    subtitle_output.append("\\N");
+                }
+                else if (tagname == "b")
+                {
+                    subtitle_output.append("{\\b1}");
+                }
+                else if (tagname == "i")
+                {
+                    subtitle_output.append("{\\i1}");
+                }
+                else if (tagname == "u")
+                {
+                    subtitle_output.append("{\\u1}");
+                }
+                else if (tagname == "s")
+                {
+                    subtitle_output.append("{\\s1}");
+                }
+                else if (tagname == "font")
+                {
+                    std::string attribute_name;
+                    std::string attribute_value;
+
+                    attribute_name = ConsumeAttribute(&psz_subtitle, attribute_value);
+                    while (!attribute_name.empty())
+                    {
+                        // Convert attribute_name to lowercase
+                        std::transform(attribute_name.begin(), attribute_name.end(), attribute_name.begin(), ::tolower);
+                        if (attribute_name == "face")
+                        {
+                            subtitle_output.append("{\\fn" + attribute_value + "}");
+                        }
+                        else if (attribute_name == "family")
+                        {
+                        }
+                        if (attribute_name == "size")
+                        {
+                            double resy = settings.SrtResY / 288.0;
+                            int font_size = (int)std::round(std::stod(attribute_value) * resy);
+                            subtitle_output.append("{\\fs" + std::to_string(font_size) + "}");
+                        }
+                        else if (attribute_name == "color")
+                        {
+                            MatchColorSrt(attribute_value);
+
+                            // If color is invalid, use WHITE
+                            if ((strtoul(attribute_value.c_str(), NULL, 16) == 0) && (attribute_value != "000000"))
+                                attribute_value.assign("FFFFFF");
+
+                            // HTML is RGB and we need BGR for libass
+                            swapRGBtoBGR(attribute_value);
+                            subtitle_output.append("{\\c&H" + attribute_value + "&}");
+                        }
+                        attribute_name = ConsumeAttribute(&psz_subtitle, attribute_value);
+                    }
+                }
+                else
+                {
+                    // This is an unknown tag. We need to hide it if it's properly closed, and display it otherwise
+                    if (!IsClosed(psz_subtitle, tagname.c_str()))
+                    {
+                        //subtitle_output.append("<" + tagname + ">");
+                    }
+                    else
+                    {
+                    }
+                    // In any case, fall through and skip to the closing tag.
+                }
+                // Skip potential spaces & end tag
+                while (*psz_subtitle && *psz_subtitle != '>')
+                    psz_subtitle++;
+                if (*psz_subtitle == '>')
+                    psz_subtitle++;
+
             }
-            // look for text color tag between quotes
-            else if (vecSrtLines[cnt].find("<font color=\"") != std::string::npos)
+            else if (!strncmp(psz_subtitle, "</", 2))
             {
-                fntStr = vecSrtLines[cnt].substr(found);
-                sscanf_s(fntStr.c_str(), "<font color=\"%[a-zA-Z]\">", &fntColor, (unsigned int)sizeof(fntColor));
-                fntStr = fntColor;
-                MatchColorSrt(fntColor, sizeof(fntColor));
-                fntStr.insert(0, "<font color=\"").append("\">");
+                std::string tagname = GetTag(&psz_subtitle, true);
+                if (!tagname.empty())
+                {
+                    std::transform(tagname.begin(), tagname.end(), tagname.begin(), ::tolower);
+                    if (tagname == "b")
+                    {
+                        subtitle_output.append("{\\b0}");
+                    }
+                    else if (tagname == "i")
+                    {
+                        subtitle_output.append("{\\i0}");
+                    }
+                    else if (tagname == "u")
+                    {
+                        subtitle_output.append("{\\u0}");
+                    }
+                    else if (tagname == "s")
+                    {
+                        subtitle_output.append("{\\s0}");
+                    }
+                    else if (tagname == "font")
+                    {
+                        double resy = settings.SrtResY / 288.0;
+                        int font_size = (int)std::round(settings.FontSize * resy);
+                        subtitle_output.append("{\\c}");
+                        subtitle_output.append("{\\fn" + ws2s(settings.FontName) + "}");
+                        subtitle_output.append("{\\fs" + std::to_string(font_size) + "}");
+                    }
+                    else
+                    {
+                        // Unknown closing tag. If it is closing an unknown tag, ignore it. Otherwise, display it
+                        //subtitle_output.append("</" + tagname + ">");
+                    }
+                    while (*psz_subtitle == ' ')
+                        psz_subtitle++;
+                    if (*psz_subtitle == '>')
+                        psz_subtitle++;
+                }
             }
-            // Look for hex color tag starting with #
             else
             {
-                fntStr = vecSrtLines[cnt].substr(found);
-                sscanf_s(fntStr.c_str(), "<font color=#%6s>", &fntColor, (unsigned int)sizeof(fntColor));
-                fntStr = fntColor;
-                fntStr.insert(0, "<font color=#").append(">");
+                /* We have an unknown tag, just append it, and move on.
+                * The rest of the string won't be recognized as a tag, and
+                * we will ignore unknown closing tag
+                */
+                subtitle_output.push_back('<');
+                psz_subtitle++;
             }
-
-            // font color tag in srt is RGB and we need BGR
-            char tmpColor[7];
-            strcpy_s(tmpColor, sizeof(tmpColor), fntColor);
-            tmpColor[0] = fntColor[4];
-            tmpColor[1] = fntColor[5];
-            tmpColor[4] = fntColor[0];
-            tmpColor[5] = fntColor[1];
-            std::string assStr;
-            assStr.append("{\\1c&H").append(tmpColor).append("&}{\\3c&H").append("000000").append("&}");
-            FindReplace(vecSrtLines[cnt], fntStr, assStr);
         }
-        srtLine.append(vecSrtLines[cnt]).append("\\N");
+        /* MicroDVD extensions */
+        /* FIXME:
+        *  - Currently, we don't do difference between X and x, and we should:
+        *    Capital Letters applies to the whole text and not one line
+        *  - We don't support Position and Coordinates
+        *  - We don't support the DEFAULT flag (HEADER)
+        */
+        else if (psz_subtitle[0] == '{' && psz_subtitle[2] == ':' && strchr(&psz_subtitle[2], '}'))
+        {
+            const char *psz_tag_end = strchr(&psz_subtitle[2], '}');
+            size_t i_len = psz_tag_end - &psz_subtitle[3];
+
+            if (psz_subtitle[1] == 'Y' || psz_subtitle[1] == 'y')
+            {
+                if (psz_subtitle[3] == 'i')
+                {
+                    subtitle_output.append("{\\i1}");
+                    psz_subtitle++;
+                }
+                if (psz_subtitle[3] == 'b')
+                {
+                    subtitle_output.append("{\\b1}");
+                    psz_subtitle++;
+                }
+                if (psz_subtitle[3] == 'u')
+                {
+                    subtitle_output.append("{\\u1}");
+                    psz_subtitle++;
+                }
+            }
+            else if ((psz_subtitle[1] == 'C' || psz_subtitle[1] == 'c')
+                && psz_subtitle[3] == '$' && i_len >= 7)
+            {
+                /* Yes, they use BBGGRR */
+                char psz_color[7];
+                psz_color[0] = psz_subtitle[4]; psz_color[1] = psz_subtitle[5];
+                psz_color[2] = psz_subtitle[6]; psz_color[3] = psz_subtitle[7];
+                psz_color[4] = psz_subtitle[8]; psz_color[5] = psz_subtitle[9];
+                psz_color[6] = '\0';
+                subtitle_output.append("{\\c&H").append(psz_color).append("&}");
+            }
+            else if (psz_subtitle[1] == 'F' || psz_subtitle[1] == 'f')
+            {
+                std::string font_name(&psz_subtitle[3], i_len);
+                subtitle_output.append("{\\fn" + font_name + "}");
+            }
+            else if (psz_subtitle[1] == 'S' || psz_subtitle[1] == 's')
+            {
+                int size = atoi(&psz_subtitle[3]);
+                if (size)
+                {
+                    double resy = settings.SrtResY / 288.0;
+                    int font_size = (int)std::round(size * resy);
+                    subtitle_output.append("{\\fs" + std::to_string(font_size) + "}");
+                }
+            }
+            // Hide other {x:y} atrocities, notably {o:x}
+            psz_subtitle = psz_tag_end + 1;
+        }
+        else
+        {
+            if (*psz_subtitle == '\n' || !_strnicmp(psz_subtitle, "\\n", 2))
+            {
+                subtitle_output.append("\\N");
+
+                if (*psz_subtitle == '\n')
+                    psz_subtitle++;
+                else
+                    psz_subtitle += 2;
+            }
+            else if (*psz_subtitle == '\r')
+            {
+                psz_subtitle++;
+            }
+            else
+            {
+                subtitle_output.push_back(*psz_subtitle);
+                psz_subtitle++;
+            }
+        }
     }
-    FindReplace(srtLine, std::string("</font>"), std::string(origFontAssTag));
-    FindReplace(srtLine, std::string("\r"), std::string(""));
+    srtLine.assign(subtitle_output);
 }
 
 // Match color name to its hex counterpart
-void MatchColorSrt(char *fntColor, size_t size)
+void MatchColorSrt(std::string& fntColor)
 {
-    _strlwr_s(fntColor, size);
-    for (int i = 0; i < _countof(color_tag); i++)
+    for (auto i = 0; i < _countof(color_tag); ++i)
     {
-        if (strcmp(fntColor, color_tag[i].color) == 0)
+        if (strcmp(fntColor.c_str(), color_tag[i].color) == 0)
         {
-            strcpy_s(fntColor, size, color_tag[i].hex);
+            fntColor.assign(color_tag[i].hex);
             break;
         }
-        // Return with color "white" if the color is not found in the array
-        if (i == _countof(color_tag) - 1)
-            strcpy_s(fntColor, size, "FFFFFF");
     }
 }
 

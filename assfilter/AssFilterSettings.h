@@ -40,6 +40,8 @@ struct AssFSettings
     DWORD ColorOutline;
     DWORD ColorShadow;
     DWORD CustomRes;
+    DWORD SrtResX;
+    DWORD SrtResY;
 
     std::wstring CustomTags;
     std::wstring ExtraFontsDir;
