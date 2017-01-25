@@ -86,7 +86,18 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
 
     // Check if there is already a track
     bool bTrackExist = false;
-    if (m_track) bTrackExist = true;
+    if (m_track)
+    {
+        bTrackExist = true;
+
+        // Flush subtitle cache
+        if (m_consumer)
+        {
+            m_consumer->Clear();
+            ass_flush_events(m_track.get());
+            mapSubLine.clear();
+        }
+    }
 
     m_track = decltype(m_track)(ass_new_track(m_ass.get()));
 
@@ -232,7 +243,50 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
         }
         else
         {
-            ass_process_chunk(m_track.get(), (char*)pData, pSample->GetActualDataLength(), tStart / 10000, (tStop - tStart) / 10000);
+            // Check for duplicate subtitle line
+            // Duplicate lines will happen when there is ordered chapters in the MKV file.
+            // If a duplicate ReadOrder is found, and the subtitle line is new, change the
+            // ReadOrder to make the subtitle line valid.
+            s_sub_line tstSubLine;
+            tstSubLine.tStart = tStart;
+            tstSubLine.tStop = tStop;
+            tstSubLine.subLine = std::string((char*)pData, pSample->GetActualDataLength());
+            size_t pos = tstSubLine.subLine.find_first_of(',');
+            tstSubLine.readOrder = strtol(tstSubLine.subLine.substr(0, pos).c_str(), NULL, 10);
+            DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() ReadOrder: %d", tstSubLine.readOrder));
+            DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() pData: %S", tstSubLine.subLine.c_str()));
+            if (mapSubLine.empty())
+            {
+                ass_process_chunk(m_track.get(), (char*)pData, pSample->GetActualDataLength(), tStart / 10000, (tStop - tStart) / 10000);
+                mapSubLine.emplace(tstSubLine.readOrder, tstSubLine);
+            }
+            else
+            {
+                bool found = false;
+                size_t countReadOrder = mapSubLine.count(tstSubLine.readOrder);
+                DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() Occurences: %d", countReadOrder));
+                if (countReadOrder > 0)
+                {
+                    for (auto it = mapSubLine.equal_range(tstSubLine.readOrder).first; it != mapSubLine.equal_range(tstSubLine.readOrder).second; ++it)
+                    {
+                        if (it->second.subLine == tstSubLine.subLine)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found)
+                {
+                    std::string tstStr = tstSubLine.subLine.substr(pos);
+                    int readOrder = tstSubLine.readOrder;
+                    tstSubLine.readOrder = readOrder + ((int)countReadOrder * 30000);
+                    tstStr.insert(0, std::to_string(tstSubLine.readOrder));
+                    ass_process_chunk(m_track.get(), (char*)tstStr.c_str(), (int)tstStr.size(), tStart / 10000, (tStop - tStart) / 10000);
+                    mapSubLine.emplace(readOrder, tstSubLine);
+                    DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() Converted: %S", tstStr.c_str()));
+                }
+            }
         }
     }
 }

@@ -126,4 +126,16 @@ private:
     REFERENCE_TIME  m_iSubLineCount;    // Subtitle line number id
     std::wstring    m_wsConsumerName;   // Consumer name
     std::wstring    m_wsConsumerVer;    // Consumer version
+
+    // Subtitle data
+    // Used for ReadOrder duplicate feature
+    struct s_sub_line
+    {
+        REFERENCE_TIME tStart;
+        REFERENCE_TIME tStop;
+        int readOrder;
+        std::string subLine;
+    };
+
+    std::multimap<int, s_sub_line> mapSubLine;
 };
