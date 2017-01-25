@@ -319,12 +319,16 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
     std::wstring strVal;
 
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr, TRUE);
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         bFlag = reg.ReadBOOL(L"TrayIcon", hr);
         if (SUCCEEDED(hr)) m_settings.TrayIcon = bFlag;
 
         bFlag = reg.ReadBOOL(L"NativeSize", hr);
         if (SUCCEEDED(hr)) m_settings.NativeSize = bFlag;
+
+        bFlag = reg.ReadBOOL(L"ScaledBorderAndShadow", hr);
+        if (SUCCEEDED(hr)) m_settings.ScaledBorderAndShadow = bFlag;
 
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
@@ -394,6 +398,7 @@ HRESULT CAssFilterSettingsProp::LoadDefaults()
 {
     m_settings.TrayIcon = FALSE;
     m_settings.NativeSize = FALSE;
+    m_settings.ScaledBorderAndShadow = TRUE;
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 18;
@@ -478,9 +483,11 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
     HRESULT hr;
     CreateRegistryKey(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY);
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr);
-    if (SUCCEEDED(hr)) {
+    if (SUCCEEDED(hr))
+    {
         reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
         reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
+        reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);
