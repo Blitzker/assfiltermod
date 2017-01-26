@@ -216,9 +216,6 @@
     <ProjectReference Include="..\libass\libass.vcxproj">
       <Project>{0119c066-7ced-4fce-b819-1029aa0d36c9}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libiconv\libiconv.vcxproj">
-      <Project>{c2f3a9f8-028a-43d1-a6fe-b6e93e38ba90}</Project>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AssFilter.rc" />
