@@ -23,7 +23,8 @@
 #include "Tools.h"
 
 // Find(oldString) and replace(newString) in a string(line)
-void FindReplace(std::string& line, std::string& oldString, std::string& newString)
+template <typename T>
+void FindReplace(T& line, const T& oldString, const T& newString)
 {
     const size_t oldSize = oldString.length();
 
@@ -35,7 +36,7 @@ void FindReplace(std::string& line, std::string& oldString, std::string& newStri
     {
         // Locate the substring to replace
         pos = line.find(oldString, pos);
-        if (pos == std::string::npos) return;
+        if (pos == T::npos) return;
         if (oldSize == newSize)
         {
             // if they're same size, use std::string::replace

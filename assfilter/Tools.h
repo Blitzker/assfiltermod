@@ -133,7 +133,8 @@ static const struct s_iso639_lang {
 
 };
 
-void FindReplace(std::string& line, std::string& oldString, std::string& newString);
+template <typename T>
+void FindReplace(T& line, const T& oldString, const T& newString);
 std::wstring s2ws(const std::string& str);
 std::string ws2s(const std::wstring& wstr);
 
