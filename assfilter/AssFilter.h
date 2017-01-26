@@ -52,6 +52,7 @@ public:
 	CBasePin* GetPin(int n) override;
     STDMETHODIMP Pause() override;
     STDMETHODIMP Stop() override;
+    STDMETHODIMP JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName) override;
 
     // ISubRenderProvider
     STDMETHODIMP RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context) override;
@@ -104,6 +105,10 @@ private:
     HRESULT LoadSettings();
     HRESULT SaveSettings();
 
+    HRESULT ConnectToConsumer(IFilterGraph* pGraph);
+    HRESULT LoadFonts(IPin* pPin);
+    HRESULT LoadExternalFile();
+
     std::unique_ptr<ASS_Library, ASS_LibraryDeleter> m_ass;
     std::unique_ptr<ASS_Renderer, ASS_RendererDeleter> m_renderer;
     std::unique_ptr<ASS_Track, ASS_TrackDeleter> m_track;
@@ -117,9 +122,10 @@ private:
     // Settings
     AssFSettings    m_settings;
 
-    // Test
-    CCritSec        m_csShared;         // Protects shared data.
     bool            m_bSrtHeaderDone;   // Is the private codec data already sent?
+    bool            m_bNotFirstPause;   // Is it the first graph pause?
+    bool            m_bNoExtFile;       // External file exists?
+    bool            m_bExternalFile;    // True when there is an external sub available
     bool            m_bUnsupportedSub;  // Sub is not supported
     std::wstring    m_wsTrackName;      // Subtitle track name.
     std::wstring    m_wsTrackLang;      // Subtitle track language.

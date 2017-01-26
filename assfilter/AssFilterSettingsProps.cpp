@@ -177,6 +177,8 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
             SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)customResolution[i]);
         SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_SETCURSEL, m_settings.CustomRes, 0);
         EnableWindow(GetDlgItem(m_Dlg, IDC_COMBO1), m_settings.NativeSize);
+
+        SendDlgItemMessage(m_Dlg, IDC_EDIT15, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraFontsDir.c_str());
     }
 
     // Erase the names of the custom draw buttons
@@ -308,6 +310,9 @@ HRESULT CAssFilterSettingsProp::OnApplyChanges(void)
     SendDlgItemMessage(m_Dlg, IDC_EDIT11, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
     m_settings.CustomTags.assign(wsCustomBuffer);
 
+    SendDlgItemMessage(m_Dlg, IDC_EDIT15, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
+    m_settings.ExtraFontsDir.assign(wsCustomBuffer);
+
     return SaveSettings();
 }
 
@@ -389,6 +394,9 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
 
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
+
+        strVal = reg.ReadString(L"ExtraFontsDir", hr);
+        if (SUCCEEDED(hr)) m_settings.ExtraFontsDir = strVal;
     }
 
     return S_OK;
@@ -422,6 +430,7 @@ HRESULT CAssFilterSettingsProp::LoadDefaults()
     m_settings.SrtResY = 1080;
 
     m_settings.CustomTags = L"";
+    m_settings.ExtraFontsDir = L"{FILE_DIR}";
 
     SendDlgItemMessage(m_Dlg, IDC_FONT, WM_SETTEXT, 0, (LPARAM)m_settings.FontName.c_str());
 
@@ -475,6 +484,8 @@ HRESULT CAssFilterSettingsProp::LoadDefaults()
     SendDlgItemMessage(m_Dlg, IDC_COMBO1, CB_SETCURSEL, m_settings.CustomRes, 0);
     EnableWindow(GetDlgItem(m_Dlg, IDC_COMBO1), m_settings.NativeSize);
 
+    SendDlgItemMessage(m_Dlg, IDC_EDIT15, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraFontsDir.c_str());
+
     return S_OK;
 }
 
@@ -508,6 +519,7 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
         reg.WriteDWORD(L"SrtResX", m_settings.SrtResX);
         reg.WriteDWORD(L"SrtResY", m_settings.SrtResY);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
+        reg.WriteString(L"ExtraFontsDir", m_settings.ExtraFontsDir.c_str());
     }
 
     return S_OK;
@@ -850,6 +862,13 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
             if (wcslen(buffer) != len || oldvalue > 255)
                 SendDlgItemMessage(m_Dlg, LOWORD(wParam), WM_SETTEXT, 0, (LPARAM)buffer);
             if (value != m_settings.ColorShadow >> 24)
+                SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_EDIT15 && HIWORD(wParam) == EN_CHANGE)
+        {
+            WCHAR wsCustomBuffer[1024];
+            SendDlgItemMessage(m_Dlg, LOWORD(wParam), WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
+            if (wcscmp(wsCustomBuffer, m_settings.ExtraFontsDir.c_str()) != 0)
                 SetDirty();
         }
         else if (LOWORD(wParam) == IDC_RADIO1 && HIWORD(wParam) == BN_CLICKED)

@@ -34,7 +34,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <memory>
 #include <string>
 #include <sstream>
-#include <vector>
 
 #include "SubRenderIntf.h"
 
@@ -42,8 +41,13 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define SAFE_DELETE(p)      if(p) { delete p; p = nullptr; }
 
-_COM_SMARTPTR_TYPEDEF(IEnumFilters, __uuidof(IEnumFilters));
 _COM_SMARTPTR_TYPEDEF(IBaseFilter, __uuidof(IBaseFilter));
+_COM_SMARTPTR_TYPEDEF(IEnumFilters, __uuidof(IEnumFilters));
+_COM_SMARTPTR_TYPEDEF(IEnumPins, __uuidof(IEnumPins));
+_COM_SMARTPTR_TYPEDEF(IEnumMediaTypes, __uuidof(IEnumMediaTypes));
+_COM_SMARTPTR_TYPEDEF(IFileSourceFilter, __uuidof(IFileSourceFilter));
+_COM_SMARTPTR_TYPEDEF(IGraphConfig, __uuidof(IGraphConfig));
+_COM_SMARTPTR_TYPEDEF(IPin, __uuidof(IPin));
 _COM_SMARTPTR_TYPEDEF(ISubRenderProvider, __uuidof(ISubRenderProvider));
 _COM_SMARTPTR_TYPEDEF(ISubRenderConsumer2, __uuidof(ISubRenderConsumer2));
 _COM_SMARTPTR_TYPEDEF(ISubRenderFrame, __uuidof(ISubRenderFrame));

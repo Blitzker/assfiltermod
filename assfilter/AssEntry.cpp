@@ -18,11 +18,10 @@
 #include "stdafx.h"
 #include "AssFilter.h"
 #include "AssFilterSettingsProps.h"
+#include "AssFilterAutoLoader.h"
 
 namespace
 {
-    const WCHAR name[] = L"AssFilterMod";
-
     const AMOVIESETUP_MEDIATYPE pinTypes[] = {
         { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_ASS },
         { &MEDIATYPE_Subtitle, &MEDIASUBTYPE_UTF8 },
@@ -35,13 +34,23 @@ namespace
         L"Input", TRUE, FALSE, TRUE, TRUE, &CLSID_NULL, nullptr, _countof(pinTypes), pinTypes
     };
 
-    const AMOVIESETUP_FILTER setupFilter = {
-        &__uuidof(AssFilter), name, MERIT_UNLIKELY, 1, &setupPin, &CLSID_LegacyAmFilterCategory
+    const AMOVIESETUP_MEDIATYPE pinTypes2[] = {
+        { &GUID_NULL, &GUID_NULL }
+    };
+
+    const AMOVIESETUP_PIN setupPin2 = {
+        L"Input", FALSE, FALSE, TRUE, FALSE, &CLSID_NULL, nullptr, _countof(pinTypes2), pinTypes2
+    };
+
+    const AMOVIESETUP_FILTER setupFilter[] = {
+        { &__uuidof(AssFilter), L"AssFilterMod", MERIT_PREFERRED+2, 1, &setupPin },
+        { &__uuidof(AssFilterAutoLoader), L"AssFilterModAutoLoad", 0xffffffff, 1, &setupPin2 }
     };
 }
 
 CFactoryTemplate g_Templates[] = {
-    { name, &__uuidof(AssFilter), AssFilter::CreateInstance, nullptr, &setupFilter },
+    { setupFilter[0].strName, &__uuidof(AssFilter), AssFilter::CreateInstance, nullptr, &setupFilter[0] },
+    { setupFilter[1].strName, &__uuidof(AssFilterAutoLoader), AssFilterAutoLoader::CreateInstance, nullptr, &setupFilter[1] },
     { L"AssFilterSettingsProp", &__uuidof(CAssFilterSettingsProp), CAssFilterSettingsProp::CreateInstance, nullptr, nullptr },
     { L"AssFilterStatusProp", &__uuidof(CAssFilterStatusProp), CAssFilterStatusProp::CreateInstance, nullptr, nullptr },
     { L"AssFilterAboutProp", &__uuidof(CAssFilterAboutProp), CAssFilterAboutProp::CreateInstance, nullptr, nullptr }

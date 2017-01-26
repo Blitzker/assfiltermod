@@ -26,9 +26,11 @@
 #include "Tools.h"
 
 AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
-	: CBaseFilter("", pUnk, this, __uuidof(AssFilter))
+	: CBaseFilter(NAME("AssFilterMod"), pUnk, this, __uuidof(AssFilter))
 {
-    if (pResult) *pResult = S_OK;
+    if (pResult)
+        *pResult = S_OK;
+
     m_pin = std::make_unique<AssPin>(this, pResult);
 
     m_ass = decltype(m_ass)(ass_library_init());
@@ -42,6 +44,9 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_boolOptions["isMovable"] = false;
 
     m_bSrtHeaderDone = false;
+    m_bExternalFile = false;
+    m_bNotFirstPause = false;
+    m_bNoExtFile = false;
     m_bUnsupportedSub = false;
 
     LoadSettings();
@@ -65,15 +70,14 @@ AssFilter::~AssFilter()
 
 CUnknown* WINAPI AssFilter::CreateInstance(LPUNKNOWN pUnk, HRESULT* pResult)
 {
-    DbgLog((LOG_TRACE, 1, L"AssFilter::CreateInstance()"));
-
     try
     {
         return new AssFilter(pUnk, pResult);
     }
     catch (std::bad_alloc&)
     {
-        if (pResult) *pResult = E_OUTOFMEMORY;
+        if (pResult)
+            *pResult = E_OUTOFMEMORY;
     }
 
     return nullptr;
@@ -84,6 +88,9 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     DbgLog((LOG_TRACE, 1, L"AssFilter::SetMediaType()"));
 
     CAutoLock lock(this);
+
+    m_bExternalFile = false;
+    m_bUnsupportedSub = false;
 
     // Check if there is already a track
     bool bTrackExist = false;
@@ -100,7 +107,9 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
         }
     }
 
-    m_track = decltype(m_track)(ass_new_track(m_ass.get()));
+    // If a track already exist, don't allocate the fonts again.
+    if (!bTrackExist)
+        LoadFonts(pPin);
 
     struct SUBTITLEINFO
     {
@@ -112,24 +121,43 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     auto psi = reinterpret_cast<const SUBTITLEINFO*>(mt.Format());
 
     m_wsTrackName.assign(psi->TrackName);
-    m_wsTrackLang.assign(s2ws(MatchLanguage(std::string(psi->IsoLang)) + " (" + std::string(psi->IsoLang) + ")"));
-    m_wsSubType.assign(L"ASS");
+    std::wstring tmpIsoLang = s2ws(std::string(psi->IsoLang));
+    m_wsTrackLang.assign(MatchLanguage(tmpIsoLang) + L" (" + tmpIsoLang + L")");
 
     // SRT Media Sub-Type
     if (mt.subtype == MEDIASUBTYPE_UTF8)
     {
-        DbgLog((LOG_TRACE, 1, L"AssFilter::SetMediaType() -> SRT Mode"));
+        m_track = decltype(m_track)(ass_new_track(m_ass.get()));
         m_wsSubType.assign(L"SRT");
-
         m_bSrtHeaderDone = false;
         m_boolOptions["isMovable"] = true;
-        m_bUnsupportedSub = false;
+        m_stringOptions["yuvMatrix"] = L"None";
+        //m_stringOptions["outputLevels"] = L"PC";
     }
     // ASS Media Sub-Type
     else if (mt.subtype == MEDIASUBTYPE_ASS || mt.subtype == MEDIASUBTYPE_SSA)
     {
+        m_track = decltype(m_track)(ass_new_track(m_ass.get()));
+        m_wsSubType.assign(L"ASS");
         m_boolOptions["isMovable"] = false;
-        m_bUnsupportedSub = false;
+
+        // Extract the yuv Matrix
+        std::string strTmp((char*)mt.Format() + psi->dwOffset, mt.FormatLength() - psi->dwOffset);
+        if (strTmp.find("YCbCr Matrix: TV.601") != std::string::npos)
+        {
+            m_stringOptions["yuvMatrix"] = L"TV.601";
+            //m_stringOptions["outputLevels"] = L"TV";
+        }
+        else if (strTmp.find("YCbCr Matrix: TV.709") != std::string::npos)
+        {
+            m_stringOptions["yuvMatrix"] = L"TV.709";
+            //m_stringOptions["outputLevels"] = L"TV";
+        }
+        else
+        {
+            m_stringOptions["yuvMatrix"] = L"None";
+            //m_stringOptions["outputLevels"] = L"PC";
+        }
         ass_process_codec_private(m_track.get(), (char*)mt.Format() + psi->dwOffset, mt.FormatLength() - psi->dwOffset);
     }
     // VobSub Media Sub-Type (NOT SUPPORTED)
@@ -150,60 +178,27 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
         m_stringOptions["yuvMatrix"] = L"None";
         m_bUnsupportedSub = true;
     }
-
-    // If a track already exist, return cuz we don't need to allocate the fonts again.
-    if (bTrackExist)
-    {
-        // If the splitter don't stop the graph when switching tracks,
-        // we need to clear the consumer subtitles buffer.
-        if (m_consumer)
-            m_consumer->Clear();
-        return;
-    }
-
-    IAMGraphStreamsPtr graphStreams;
-    IDSMResourceBagPtr bag;
-    if (SUCCEEDED(GetFilterGraph()->QueryInterface(IID_PPV_ARGS(&graphStreams))) &&
-        SUCCEEDED(graphStreams->FindUpstreamInterface(pPin, IID_PPV_ARGS(&bag), AM_INTF_SEARCH_FILTER)))
-    {
-        for (DWORD i = 0; i < bag->ResGetCount(); i++)
-        {
-            _bstr_t name, desc, mime;
-            BYTE* pData = nullptr;
-            DWORD len = 0;
-            if (SUCCEEDED(bag->ResGet(i, &name.GetBSTR(), &desc.GetBSTR(), &mime.GetBSTR(), &pData, &len, nullptr)))
-            {
-                if (wcscmp(mime.GetBSTR(), L"application/x-truetype-font") == 0 ||
-                    wcscmp(mime.GetBSTR(), L"application/vnd.ms-opentype") == 0) // TODO: more mimes?
-                {
-                    ass_add_font(m_ass.get(), "", (char*)pData, len);
-                    // TODO: clear these fonts somewhere?
-                }
-                CoTaskMemFree(pData);
-            }
-        }
-    }
-
-    ass_set_fonts(m_renderer.get(), 0, 0, ASS_FONTPROVIDER_DIRECTWRITE, 0, 0);
 }
 
 void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
 {
-    if (m_bUnsupportedSub)
+    if (m_bExternalFile || m_bUnsupportedSub)
         return;
+
+    CAutoLock lock(this);
 
     DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() tSegmentStart: %I64d", tSegmentStart));
 
     REFERENCE_TIME tStart, tStop;
     BYTE* pData;
 
-    CAutoLock lock(this);
-
     if (SUCCEEDED(pSample->GetTime(&tStart, &tStop)) &&
         SUCCEEDED(pSample->GetPointer(&pData)))
     {
         tStart += tSegmentStart;
         tStop += tSegmentStart;
+
+        DbgLog((LOG_TRACE, 1, L"AssFilter::Receive() tStart: %I64d, tStop: %I64d", tStart, tStop));
 
         if (m_wsSubType == L"SRT")
         {
@@ -337,12 +332,18 @@ STDMETHODIMP AssFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 int AssFilter::GetPinCount()
 {
+    if (m_bExternalFile)
+        return 0;
+
 	return 1;
 }
 
 CBasePin* AssFilter::GetPin(int n)
 {
-	return m_pin.get();
+    if (m_bExternalFile)
+        return NULL;
+
+    return m_pin.get();
 }
 
 STDMETHODIMP AssFilter::Pause()
@@ -350,38 +351,18 @@ STDMETHODIMP AssFilter::Pause()
     DbgLog((LOG_TRACE, 1, L"AssFilter::Pause()"));
 
     CAutoLock lock(this);
-    
-    if (m_pGraph)
+
+    if (!m_bNotFirstPause)
     {
-        IEnumFiltersPtr filters;
-        if (SUCCEEDED(m_pGraph->EnumFilters(&filters)))
+        if (m_bExternalFile)
         {
-            ISubRenderConsumer2Ptr consumer;
-            ISubRenderProviderPtr provider;
-
-            for (IBaseFilterPtr filter; filters->Next(1, &filter, 0) == S_OK;)
-            {
-                if (SUCCEEDED(filter->QueryInterface(IID_PPV_ARGS(&consumer))) &&
-                    SUCCEEDED(QueryInterface(IID_PPV_ARGS(&provider))) &&
-                    SUCCEEDED(consumer->Connect(provider)))
-                {
-                    DbgLog((LOG_TRACE, 1, L"AssFilter::Pause() -> Connected to consumer"));
-                    m_consumer = consumer;
-                    m_consumerLastId = 0;
-
-                    LPWSTR cName;
-                    int cChars;
-
-                    m_consumer->GetString("name", &cName, &cChars);
-                    m_wsConsumerName.assign(cName);
-                    LocalFree(cName);
-
-                    m_consumer->GetString("version", &cName, &cChars);
-                    m_wsConsumerVer.assign(cName);
-                    LocalFree(cName);
-                }
-            }
+            if (FAILED(LoadExternalFile()))
+                m_bNoExtFile = true;
         }
+
+        m_bNotFirstPause = true;
+        if (!m_bNoExtFile)
+            ConnectToConsumer(m_pGraph);
     }
 
     return __super::Pause();
@@ -393,13 +374,46 @@ STDMETHODIMP AssFilter::Stop()
 
     CAutoLock lock(this);
 
-    if (m_consumer)
+    return __super::Stop();
+}
+
+STDMETHODIMP AssFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
+{
+    CAutoLock lock(this);
+
+    HRESULT hr = NOERROR;
+    if (pGraph)
     {
-        m_consumer->Disconnect();
-        m_consumer = nullptr;
+        DbgLog((LOG_TRACE, 1, L"AssFilter::JoinFilterGraph() -> %s joined the graph!", pName));
+
+        hr = __super::JoinFilterGraph(pGraph, pName);
+        if (FAILED(hr))
+        {
+            DbgLog((LOG_TRACE, 1, L"AssFilter::JoinFilterGraph() -> Failed to join filter graph!", pName));
+            return hr;
+        }
+        if (wcscmp(pName, L"AssFilterMod(AutoLoad)") == 0)
+            m_bExternalFile = true;
+        return hr;
+    }
+    else
+    {
+        DbgLog((LOG_TRACE, 1, L"AssFilter::JoinFilterGraph() -> left the graph!", pName));
+        if (m_consumer)
+        {
+            if (FAILED(m_consumer->Disconnect()))
+            {
+                DbgLog((LOG_TRACE, 1, L"AssFilter::JoinFilterGraph() -> Failed to disconnect consumer!", pName));
+            }
+            CAutoLock lock(this);
+            m_consumer = nullptr;
+        }
+        m_bNotFirstPause = false;
+
+        return __super::JoinFilterGraph(pGraph, pName);
     }
 
-    return __super::Stop();
+    return E_FAIL;
 }
 
 STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, LPVOID context)
@@ -413,10 +427,6 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
     RECT videoOutputRect;
     m_consumer->GetRect("videoOutputRect", &videoOutputRect);
     DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() videoOutputRect: %u, %u, %u, %u", videoOutputRect.left, videoOutputRect.top, videoOutputRect.right, videoOutputRect.bottom));
-
-    //RECT subtitleTargetRect;
-    //m_consumer->GetRect("subtitleTargetRect", &subtitleTargetRect);
-    //DbgLog((LOG_TRACE, 1, L"AssFilter::RequestFrame() subtitleTargetRect: %u, %u, %u, %u", subtitleTargetRect.left, subtitleTargetRect.top, subtitleTargetRect.right, subtitleTargetRect.bottom));
 
     // The video rect we render the subtitles on
     RECT videoRect{};
@@ -490,6 +500,7 @@ STDMETHODIMP AssFilter::Disconnect(void)
 
     CAutoLock lock(this);
     m_consumer = nullptr;
+
     return S_OK;
 }
 
@@ -497,6 +508,7 @@ STDMETHODIMP AssFilter::GetBool(LPCSTR field, bool* value)
 {
     CheckPointer(value, E_POINTER);
     *value = m_boolOptions[field];
+
     return S_OK;
 }
 
@@ -535,7 +547,9 @@ STDMETHODIMP AssFilter::GetString(LPCSTR field, LPWSTR* value, int* chars)
     (*value)[len] = '\0';
     if (chars)
         *chars = static_cast<int>(len);
+
     DbgLog((LOG_TRACE, 1, L"AssFilter::GetString() field: %S, value: %s, chars: %d", field, *value, *chars));
+
     return S_OK;
 }
 
@@ -546,8 +560,9 @@ STDMETHODIMP AssFilter::GetBin(LPCSTR field, LPVOID* value, int* size)
 
 STDMETHODIMP AssFilter::SetBool(LPCSTR field, bool value)
 {
-    if (!strcmp(field, "combineBitmaps"))
+    if (strcmp(field, "combineBitmaps") == 0)
         m_boolOptions[field] = value;
+
     return S_OK;
 }
 
@@ -686,6 +701,7 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.SrtResY = 1080;
 
     m_settings.CustomTags = L"";
+    m_settings.ExtraFontsDir = L"{FILE_DIR}";
 
     return S_OK;
 }
@@ -768,6 +784,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
 
         strVal = reg.ReadString(L"CustomTags", hr);
         if (SUCCEEDED(hr)) m_settings.CustomTags = strVal;
+
+        strVal = reg.ReadString(L"ExtraFontsDir", hr);
+        if (SUCCEEDED(hr)) m_settings.ExtraFontsDir = strVal;
     }
     else
         SaveSettings();
@@ -813,7 +832,187 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteDWORD(L"SrtResX", m_settings.SrtResX);
         reg.WriteDWORD(L"SrtResY", m_settings.SrtResY);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
+        reg.WriteString(L"ExtraFontsDir", m_settings.ExtraFontsDir.c_str());
     }
+
+    return S_OK;
+}
+
+HRESULT AssFilter::ConnectToConsumer(IFilterGraph* pGraph)
+{
+    CheckPointer(pGraph, E_POINTER);
+
+    IEnumFiltersPtr filters;
+    if (SUCCEEDED(pGraph->EnumFilters(&filters)))
+    {
+        ISubRenderConsumer2Ptr consumer;
+        ISubRenderProviderPtr provider;
+        for (IBaseFilterPtr filter; filters->Next(1, &filter, 0) == S_OK; filter = NULL)
+        {
+            if (SUCCEEDED(filter->QueryInterface(IID_PPV_ARGS(&consumer))) &&
+                SUCCEEDED(QueryInterface(IID_PPV_ARGS(&provider))))
+            {
+                if (FAILED(consumer->Connect(provider)))
+                {
+                    DbgLog((LOG_TRACE, 1, L"AssFilter::ConnectToConsumer() -> Already connected"));
+
+                    return S_OK;
+                }
+
+                m_consumer = consumer;
+                m_consumerLastId = 0;
+
+                LPWSTR cName;
+                int cChars;
+
+                m_consumer->GetString("name", &cName, &cChars);
+                m_wsConsumerName.assign(cName);
+                LocalFree(cName);
+
+                m_consumer->GetString("version", &cName, &cChars);
+                m_wsConsumerVer.assign(cName);
+                LocalFree(cName);
+
+                DbgLog((LOG_TRACE, 1, L"AssFilter::ConnectToConsumer() -> Connected to consumer %s v%s", m_wsConsumerName.c_str(), m_wsConsumerVer.c_str()));
+
+                return S_OK;
+            }
+        }
+    }
+
+    return E_FAIL;
+}
+
+HRESULT AssFilter::LoadFonts(IPin* pPin)
+{
+    // Try to load fonts in the container
+    IAMGraphStreamsPtr graphStreams;
+    IDSMResourceBagPtr bag;
+    if (SUCCEEDED(GetFilterGraph()->QueryInterface(IID_PPV_ARGS(&graphStreams))) &&
+        SUCCEEDED(graphStreams->FindUpstreamInterface(pPin, IID_PPV_ARGS(&bag), AM_INTF_SEARCH_FILTER)))
+    {
+        for (DWORD i = 0; i < bag->ResGetCount(); ++i)
+        {
+            _bstr_t name, desc, mime;
+            BYTE* pData = nullptr;
+            DWORD len = 0;
+            if (SUCCEEDED(bag->ResGet(i, &name.GetBSTR(), &desc.GetBSTR(), &mime.GetBSTR(), &pData, &len, nullptr)))
+            {
+                if (wcscmp(mime.GetBSTR(), L"application/x-truetype-font") == 0 ||
+                    wcscmp(mime.GetBSTR(), L"application/vnd.ms-opentype") == 0) // TODO: more mimes?
+                {
+                    ass_add_font(m_ass.get(), "", (char*)pData, len);
+                    // TODO: clear these fonts somewhere?
+                }
+                CoTaskMemFree(pData);
+            }
+        }
+    }
+
+    ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
+
+    return S_OK;
+}
+
+HRESULT AssFilter::LoadExternalFile()
+{
+    // Check for external subs
+    std::wstring extFileName;
+    IEnumFiltersPtr pEnumFilters;
+    if (SUCCEEDED(m_pGraph->EnumFilters(&pEnumFilters)))
+    {
+        for (IBaseFilterPtr pBaseFilter; pEnumFilters->Next(1, &pBaseFilter, 0) == S_OK; pBaseFilter = NULL)
+        {
+            IFileSourceFilterPtr pFSF;
+            if (SUCCEEDED(pBaseFilter->QueryInterface(IID_PPV_ARGS(&pFSF))))
+            {
+                LPOLESTR fnw = NULL;
+                if (!pFSF || FAILED(pFSF->GetCurFile(&fnw, NULL)) || !fnw)
+                    continue;
+                extFileName.assign(fnw);
+                CoTaskMemFree(fnw);
+                break;
+            }
+        }
+    }
+
+    std::wstring name = extFileName.substr(0, extFileName.find_last_of(L'.') + 1);
+
+    // Try to find an external subtitle file
+    // First try to find a filename with 2 letters language code in it (ex: subfile.en.ass)
+    bool externalSubFound = false;
+    UINT codePage = GetACP();
+    DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> System CodePage is %u", codePage));
+    for (auto i = 0; i < _countof(iso639_lang); ++i)
+    {
+        if (fexists(std::wstring(name).append(iso639_lang[i].lang2).append(L".ass")))
+        {
+            externalSubFound = true;
+            extFileName = std::wstring(name).append(iso639_lang[i].lang2).append(L".ass");
+            m_wsTrackLang.assign(iso639_lang[i].language).append(L" (").append(iso639_lang[i].lang3).append(L")");
+            m_wsSubType.assign(L"ASS");
+            break;
+        }
+        else if (fexists(std::wstring(name).append(iso639_lang[i].lang2).append(L".srt")))
+        {
+            externalSubFound = true;
+            extFileName = std::wstring(name).append(iso639_lang[i].lang2).append(L".srt");
+            m_wsTrackLang.assign(iso639_lang[i].language).append(L" (").append(iso639_lang[i].lang3).append(L")");
+            codePage = iso639_lang[i].codepage;
+            m_wsSubType.assign(L"SRT");
+            break;
+        }
+        // Try a filename without a 2 letters language code
+        if (i == _countof(iso639_lang) - 1)
+        {
+            if (fexists(std::wstring(name).append(L"ass")))
+            {
+                externalSubFound = true;
+                extFileName = std::wstring(name).append(L"ass");
+                m_wsTrackLang.assign(MatchLanguage(std::wstring(L"und")).append(L" (und)"));
+                m_wsSubType.assign(L"ASS");
+            }
+            else if (fexists(std::wstring(name).append(L"srt")))
+            {
+                externalSubFound = true;
+                extFileName = std::wstring(name).append(L"srt");
+                m_wsTrackLang.assign(MatchLanguage(std::wstring(L"und")).append(L" (und)"));
+                m_wsSubType.assign(L"SRT");
+            }
+        }
+    }
+    if (externalSubFound && m_wsSubType == L"ASS")
+    {
+        ass_set_fonts_dir(m_ass.get(), ws2s(ParseFontsPath(m_settings.ExtraFontsDir, name)).c_str());
+        ass_set_extract_fonts(m_ass.get(), TRUE);
+        m_track = decltype(m_track)(ass_read_file(m_ass.get(), const_cast<char*>(ws2s(extFileName).c_str()), "UTF-8"));
+        ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
+        m_wsTrackName.assign(extFileName);
+        m_stringOptions["yuvMatrix"] = ExtractYuvMatrix(m_wsTrackName);
+        m_boolOptions["isMovable"] = false;
+
+        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> External ASS %s", extFileName.c_str()));
+        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> Extra Fonts %s", ParseFontsPath(m_settings.ExtraFontsDir, name).c_str()));
+    }
+    else if (externalSubFound && m_wsSubType == L"SRT")
+    {
+        // Check if the file needs conversion to UTF-8
+        if ((codePage != 0) && isFileUTF8(extFileName))
+        {
+            codePage = 0;
+            DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> File is UTF-8!"));
+        }
+        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> Using CodePage %u to convert to UTF-8!", codePage));
+        m_track = decltype(m_track)(srt_read_file(m_ass.get(), const_cast<char*>(ws2s(extFileName).c_str()), m_settings, codePage));
+        ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
+        m_wsTrackName.assign(extFileName);
+        m_stringOptions["yuvMatrix"] = L"None";
+        m_boolOptions["isMovable"] = true;
+
+        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> External SRT %s", extFileName.c_str()));
+    }
+    else
+        return E_FAIL;
 
     return S_OK;
 }

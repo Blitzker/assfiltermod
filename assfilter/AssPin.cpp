@@ -69,8 +69,9 @@ HRESULT AssPin::SetMediaType(const CMediaType* pmt)
 {
     assert(CritCheckIn(this));
 
+    DbgLog((LOG_TRACE, 1, L"AssPin::SetMediaType -> Embedded"));
+    DisplayTypeInfo(this, pmt);
     ReturnIfFailed(CBaseInputPin::SetMediaType(pmt));
-
     m_pAssFilter->SetMediaType(*pmt, m_Connected);
 
     return S_OK;

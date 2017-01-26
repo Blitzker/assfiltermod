@@ -176,6 +176,7 @@
     <ClCompile Include="AssDebug.cpp" />
     <ClCompile Include="AssEntry.cpp" />
     <ClCompile Include="AssFilter.cpp" />
+    <ClCompile Include="AssFilterAutoLoader.cpp" />
     <ClCompile Include="AssFilterSettingsProps.cpp" />
     <ClCompile Include="AssPin.cpp" />
     <ClCompile Include="registry.cpp" />
@@ -191,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="AssDebug.h" />
     <ClInclude Include="AssFilter.h" />
+    <ClInclude Include="AssFilterAutoLoader.h" />
     <ClInclude Include="AssFilterSettings.h" />
     <ClInclude Include="AssFilterSettingsProps.h" />
     <ClInclude Include="AssPin.h" />
@@ -201,6 +203,7 @@
     <ClInclude Include="SubFrame.h" />
     <ClInclude Include="SubRenderIntf.h" />
     <ClInclude Include="Tools.h" />
+    <ClInclude Include="utf8.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
