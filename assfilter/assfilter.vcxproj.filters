@@ -1,35 +1,94 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="AssFilter.cpp" />
-    <ClCompile Include="AssPin.cpp" />
-    <ClCompile Include="AssEntry.cpp" />
-    <ClCompile Include="SubFrame.cpp" />
-    <ClCompile Include="AssFilterSettingsProps.cpp" />
-    <ClCompile Include="AssDebug.cpp" />
-    <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="registry.cpp" />
+    <ClCompile Include="AssDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssEntry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssFilterSettingsProps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssPin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SubFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SubRenderIntf.h" />
-    <ClInclude Include="AssFilter.h" />
-    <ClInclude Include="AssPin.h" />
-    <ClInclude Include="SubFrame.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="AssFilterSettings.h" />
-    <ClInclude Include="ISpecifyPropertyPages2.h" />
-    <ClInclude Include="AssFilterSettingsProps.h" />
-    <ClInclude Include="version.h" />
-    <ClInclude Include="AssDebug.h" />
-    <ClInclude Include="Tools.h" />
-    <ClInclude Include="registry.h" />
+    <ClInclude Include="AssDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssFilterSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssFilterSettingsProps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssPin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ISpecifyPropertyPages2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubRenderIntf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon1.ico" />
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{ffcc2e31-e77a-435b-9b19-681ca92ee4bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{cdca69c4-14cf-404e-9756-026948116713}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{f70d5522-275e-44d0-9bbc-5c1bfabc26a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="AssFilter.rc" />
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AssFilter.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
