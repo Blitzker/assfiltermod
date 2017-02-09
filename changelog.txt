@@ -1,6 +1,9 @@
-not yet released
+v0.3
 - add: Reset Settings button
+- add: Auto-load of external subtitles
+- add: Better SRT subtitles parser
 - fix: Blur setting not working
+- Values in the settings are now more in line with thoses of VSFilter
 - Update to Visual Studio Update 3
 
 v0.2

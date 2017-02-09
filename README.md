@@ -14,10 +14,11 @@ AssFilterMod is a version of AssFilter with new features and bug fixes:
 * Works with built-in video renderers in MPC-HC
 * Fix crash when the subtitle track is changed
 * Use latest versions of libraries
+* Auto-loading of external subtitles
 
 The SRT subtitles can be configured via the Settings tab.
 
-![img](http://i.imgur.com/k5HCTf2.png)
+![img](http://i.imgur.com/PM5Kl5n.png)
 
 In the Custom Tags edit control, you can enter [Ass Tags](http://docs.aegisub.org/3.1/ASS_Tags/) and customize your SRT subtitles the way you want.
 
@@ -26,10 +27,10 @@ Ex: If you want your subtitles to be **BOLD**, enter `{\b1}`.
 **Important notes:**
 * All tags that you use in the Customs Tags will overwrite the default settings.
 * Settings are saved in the registry: `HKEY_CURRENT_USER\Software\AssFilter`
-* Only subtitles (ASS and SRT) muxed in MKV files are supported.
+* Only ASS and SRT subtitles are supported.
 
 ### Requirements
-* [Visual Studio 2015 Update 3 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=52982)
+* [Visual Studio 2015 Update 3 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=53840)
 * [DirectX 9 Redistribuables](https://www.microsoft.com/en-ca/download/details.aspx?id=8109)
 
 Windows Vista, 7, 8, 8.1 and 10 (32 and 64 bits)
@@ -49,9 +50,8 @@ Compiling AssFilterMod is pretty straightforward:
 
 * [DirectShow Base Classes](https://msdn.microsoft.com/en-us/library/windows/desktop/dd375456%28v=vs.85%29.aspx)
 * [FreeType](https://www.freetype.org/)
-* [GNU FriBidi](https://www.fribidi.org/)
+* [FriBidi](https://www.fribidi.org/)
 * [libass](https://github.com/libass/libass)
-* [libiconv](https://www.gnu.org/software/libiconv/)
 
 ### Credits
 
@@ -59,3 +59,4 @@ Compiling AssFilterMod is pretty straightforward:
 * [LAV Filters](https://github.com/nevcairiel/lavfilters) Nevcairiel's awesome DirectShow Media Splitter and Decoders
 * [MPC-HC](https://github.com/mpc-hc/mpc-hc) Light-weight media player for Windows
 * [stackoverflow](https://stackoverflow.com/) Not a project, but a lot of useful ideas and code
+* [VideoLAN Org](https://www.videolan.org/vlc/index.html) VLC Media player (SRT subtitles parser code)
