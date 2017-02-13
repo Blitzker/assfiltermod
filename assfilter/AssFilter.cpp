@@ -37,7 +37,7 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_renderer = decltype(m_renderer)(ass_renderer_init(m_ass.get()));
 
     m_stringOptions["name"] = L"AssFilterMod";
-    m_stringOptions["version"] = L"0.2.1.0";
+    m_stringOptions["version"] = L"0.3.0.0";
     m_stringOptions["yuvMatrix"] = L"None";
     m_stringOptions["outputLevels"] = L"PC";
     m_boolOptions["combineBitmaps"] = false;
