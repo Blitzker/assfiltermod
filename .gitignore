@@ -5,6 +5,7 @@
 *.sdf
 *.suo
 *.user
+/.vs
 /bin
 /ipch
 /msvc
