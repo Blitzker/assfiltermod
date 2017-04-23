@@ -7,4 +7,6 @@
 *.user
 /bin
 /ipch
+/msvc
+/obj
 version_rev.h

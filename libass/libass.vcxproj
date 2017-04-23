@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../freetype/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -100,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../freetype/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -115,7 +115,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../freetype/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -132,7 +132,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>.;../fribidi;../fribidi/upstream/lib;../freetype/include;../libiconv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../freetype/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

@@ -21,7 +21,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{03854F24-CFF5-4E2A-A24B-B9FAA677E438}</ProjectGuid>
     <RootNamespace>assfilter</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>assfiltermod</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -213,11 +212,11 @@
     <ProjectReference Include="..\freetype\builds\windows\vc2010\freetype.vcxproj">
       <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\fribidi\fribidi.vcxproj">
-      <Project>{2537f17e-7d93-4968-a133-cbbaa8c3bce2}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libass\libass.vcxproj">
       <Project>{0119c066-7ced-4fce-b819-1029aa0d36c9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SMP\fribidi\SMP\libfribidi.vcxproj">
+      <Project>{08091723-a142-478b-a092-20741ba8fae2}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

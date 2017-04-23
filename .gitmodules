@@ -1,3 +1,6 @@
 [submodule "libass"]
 	path = libass/upstream
 	url = https://github.com/libass/libass.git
+[submodule "SMP/fribidi"]
+	path = SMP/fribidi
+	url = https://github.com/Blitzker/fribidi.git

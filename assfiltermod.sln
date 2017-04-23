@@ -4,18 +4,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "assfiltermod", "assfilter\assfilter.vcxproj", "{03854F24-CFF5-4E2A-A24B-B9FAA677E438}"
+	ProjectSection(ProjectDependencies) = postProject
+		{08091723-A142-478B-A092-20741BA8FAE2} = {08091723-A142-478B-A092-20741BA8FAE2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "baseclasses", "baseclasses\baseclasses.vcxproj", "{733B9B48-7A2F-49A0-BF8D-C3607E8B1CEF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libass", "libass\libass.vcxproj", "{0119C066-7CED-4FCE-B819-1029AA0D36C9}"
 	ProjectSection(ProjectDependencies) = postProject
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2} = {2537F17E-7D93-4968-A133-CBBAA8C3BCE2}
+		{08091723-A142-478B-A092-20741BA8FAE2} = {08091723-A142-478B-A092-20741BA8FAE2}
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B} = {78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fribidi", "fribidi\fribidi.vcxproj", "{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "freetype\builds\windows\vc2010\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfribidi", "SMP\fribidi\SMP\libfribidi.vcxproj", "{08091723-A142-478B-A092-20741BA8FAE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,14 +52,6 @@ Global
 		{0119C066-7CED-4FCE-B819-1029AA0D36C9}.Release|Win32.Build.0 = Release|Win32
 		{0119C066-7CED-4FCE-B819-1029AA0D36C9}.Release|x64.ActiveCfg = Release|x64
 		{0119C066-7CED-4FCE-B819-1029AA0D36C9}.Release|x64.Build.0 = Release|x64
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Debug|Win32.Build.0 = Debug|Win32
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Debug|x64.ActiveCfg = Debug|x64
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Debug|x64.Build.0 = Debug|x64
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Release|Win32.ActiveCfg = Release|Win32
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Release|Win32.Build.0 = Release|Win32
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Release|x64.ActiveCfg = Release|x64
-		{2537F17E-7D93-4968-A133-CBBAA8C3BCE2}.Release|x64.Build.0 = Release|x64
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.Build.0 = Debug|Win32
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.ActiveCfg = Debug|x64
@@ -65,6 +60,14 @@ Global
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release|Win32
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release|x64
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release|x64
+		{08091723-A142-478B-A092-20741BA8FAE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{08091723-A142-478B-A092-20741BA8FAE2}.Debug|Win32.Build.0 = Debug|Win32
+		{08091723-A142-478B-A092-20741BA8FAE2}.Debug|x64.ActiveCfg = Debug|x64
+		{08091723-A142-478B-A092-20741BA8FAE2}.Debug|x64.Build.0 = Debug|x64
+		{08091723-A142-478B-A092-20741BA8FAE2}.Release|Win32.ActiveCfg = Release|Win32
+		{08091723-A142-478B-A092-20741BA8FAE2}.Release|Win32.Build.0 = Release|Win32
+		{08091723-A142-478B-A092-20741BA8FAE2}.Release|x64.ActiveCfg = Release|x64
+		{08091723-A142-478B-A092-20741BA8FAE2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
