@@ -12,8 +12,8 @@
 #define CONFIG_RASTERIZER	1
 #define CONFIG_ASM			1
 
-#ifdef _X86_
-#define __i386__
-#elif _AMD64_
+#ifdef _WIN64
 #define __x86_64__
+#else
+#define __i386__
 #endif

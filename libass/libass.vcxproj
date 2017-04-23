@@ -21,7 +21,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0119C066-7CED-4FCE-B819-1029AA0D36C9}</ProjectGuid>
     <RootNamespace>libass</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -52,6 +51,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\yasm.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -88,12 +88,17 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../SMP/freetype2/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_WINNT=0x0502;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <YASM>
+      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <PreprocessorDefinitions>PREFIX;WIN32=1;ARCH_X86_64=0;HAVE_ALIGNED_STACK=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </YASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -101,12 +106,17 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../SMP/freetype2/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_WINNT=0x0600;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <YASM>
+      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <PreprocessorDefinitions>WIN32=1;ARCH_X86_64=1;HAVE_ALIGNED_STACK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </YASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -116,7 +126,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../SMP/freetype2/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_X86_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_WINNT=0x0502;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -124,6 +134,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <YASM>
+      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <PreprocessorDefinitions>PREFIX;WIN32=1;ARCH_X86_64=0;HAVE_ALIGNED_STACK=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </YASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,7 +147,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>.;../SMP/fribidi/SMP;../SMP/fribidi/SMP/lib;../SMP/fribidi/charset;../SMP/fribidi/lib;../SMP/freetype2/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USING_STATIC_LIBICONV;_AMD64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32_WINNT=0x0600;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -141,18 +155,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <YASM>
+      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <PreprocessorDefinitions>WIN32=1;ARCH_X86_64=1;HAVE_ALIGNED_STACK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </YASM>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <Yasm Include="upstream\libass\x86\be_blur.asm">
-      <ExcludeFromBuild Condition="'$(Platform)'!='x64'">true</ExcludeFromBuild>
-    </Yasm>
-    <Yasm Include="upstream\libass\x86\cpuid.asm" />
-    <Yasm Include="upstream\libass\x86\rasterizer.asm" />
-    <Yasm Include="upstream\libass\x86\blend_bitmaps.asm" />
-    <Yasm Include="upstream\libass\x86\blur.asm" />
-    <Yasm Include="upstream\libass\x86\utils.asm" />
-    <Yasm Include="upstream\libass\x86\x86inc.asm" />
-  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="dirent.h" />
@@ -181,8 +188,19 @@
     <ClCompile Include="upstream\libass\ass_strtod.c" />
     <ClCompile Include="upstream\libass\ass_utils.c" />
   </ItemGroup>
+  <ItemGroup>
+    <YASM Include="upstream\libass\x86\be_blur.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
+    </YASM>
+    <YASM Include="upstream\libass\x86\blend_bitmaps.asm" />
+    <YASM Include="upstream\libass\x86\blur.asm" />
+    <YASM Include="upstream\libass\x86\cpuid.asm" />
+    <YASM Include="upstream\libass\x86\rasterizer.asm" />
+    <YASM Include="upstream\libass\x86\utils.asm" />
+    <YASM Include="upstream\libass\x86\x86inc.asm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="Targets">
-    <Import Project="$(MSBuildThisFileDirectory)..\yasm.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\yasm.targets" />
   </ImportGroup>
 </Project>

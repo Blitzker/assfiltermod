@@ -4,6 +4,9 @@
     <Filter Include="src">
       <UniqueIdentifier>{3bd95b26-4618-499b-a2fa-1e22d2e61081}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\asm">
+      <UniqueIdentifier>{2006c0ff-338b-42f3-a99c-00fb469e0b9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
@@ -70,5 +73,28 @@
     <ClCompile Include="upstream\libass\ass_string.c">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <YASM Include="upstream\libass\x86\be_blur.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\blend_bitmaps.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\blur.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\cpuid.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\rasterizer.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\utils.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
+    <YASM Include="upstream\libass\x86\x86inc.asm">
+      <Filter>src\asm</Filter>
+    </YASM>
   </ItemGroup>
 </Project>
