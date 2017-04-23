@@ -209,11 +209,11 @@
     <ProjectReference Include="..\baseclasses\baseclasses.vcxproj">
       <Project>{733b9b48-7a2f-49a0-bf8d-c3607e8b1cef}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\freetype\builds\windows\vc2010\freetype.vcxproj">
-      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libass\libass.vcxproj">
       <Project>{0119c066-7ced-4fce-b819-1029aa0d36c9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SMP\freetype2\SMP\libfreetype2.vcxproj">
+      <Project>{e62dc439-de3b-4f2f-84df-b34e51fa1969}</Project>
     </ProjectReference>
     <ProjectReference Include="..\SMP\fribidi\SMP\libfribidi.vcxproj">
       <Project>{08091723-a142-478b-a092-20741ba8fae2}</Project>

@@ -4,3 +4,6 @@
 [submodule "SMP/fribidi"]
 	path = SMP/fribidi
 	url = https://github.com/Blitzker/fribidi.git
+[submodule "SMP/freetype2"]
+	path = SMP/freetype2
+	url = https://github.com/Blitzker/freetype2.git
