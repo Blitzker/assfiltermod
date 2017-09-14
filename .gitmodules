@@ -1,9 +1,9 @@
-[submodule "libass"]
-	path = libass/upstream
-	url = https://github.com/libass/libass.git
 [submodule "SMP/fribidi"]
 	path = SMP/fribidi
 	url = https://github.com/Blitzker/fribidi.git
 [submodule "SMP/freetype2"]
 	path = SMP/freetype2
 	url = https://github.com/Blitzker/freetype2.git
+[submodule "libass/upstream"]
+	path = libass/upstream
+	url = https://github.com/Blitzker/libass.git
