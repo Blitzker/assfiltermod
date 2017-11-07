@@ -221,6 +221,9 @@
     <ProjectReference Include="..\SMP\fribidi\SMP\libfribidi.vcxproj">
       <Project>{08091723-a142-478b-a092-20741ba8fae2}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\SMP\harfbuzz\SMP\libharfbuzz.vcxproj">
+      <Project>{9db795b7-e8bd-4846-82a5-c6d2577b1aaf}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AssFilter.rc" />

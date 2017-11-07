@@ -7,3 +7,6 @@
 [submodule "libass/upstream"]
 	path = libass/upstream
 	url = https://github.com/Blitzker/libass.git
+[submodule "SMP/harfbuzz"]
+	path = SMP/harfbuzz
+	url = https://github.com/Blitzker/harfbuzz.git
