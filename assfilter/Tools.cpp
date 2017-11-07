@@ -526,7 +526,7 @@ std::wstring MatchLanguage(const std::wstring& langCode, bool isCode2Chars)
     return std::wstring(L"ERROR!!!");
 }
 
-ASS_Track* srt_read_file(ASS_Library* library, char* fname, const AssFSettings& settings, const UINT codePage)
+ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const AssFSettings& settings, const UINT codePage)
 {
     // Convert SRT to ASS
     std::ifstream srtFile(fname, std::ios::in);

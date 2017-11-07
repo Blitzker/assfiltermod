@@ -1003,7 +1003,7 @@ HRESULT AssFilter::LoadExternalFile()
             DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> File is UTF-8!"));
         }
         DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> Using CodePage %u to convert to UTF-8!", codePage));
-        m_track = decltype(m_track)(srt_read_file(m_ass.get(), const_cast<char*>(ws2s(extFileName).c_str()), m_settings, codePage));
+        m_track = decltype(m_track)(srt_read_file(m_ass.get(), extFileName, m_settings, codePage));
         ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
         m_wsTrackName.assign(extFileName);
         m_stringOptions["yuvMatrix"] = L"None";

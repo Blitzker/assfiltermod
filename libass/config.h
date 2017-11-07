@@ -12,6 +12,7 @@
 #define CONFIG_RASTERIZER	1
 #define CONFIG_ASM			1
 #define CONFIG_HARFBUZZ     1
+#define CONFIG_WINUTF16     1
 
 #ifdef _WIN64
 #define __x86_64__

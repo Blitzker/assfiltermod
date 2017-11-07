@@ -152,7 +152,7 @@ bool IsClosed(const char* psz_subtitle, const char* psz_tagname);
 void ParseSrtLine(std::string& srtLine, const AssFSettings& settings);
 void MatchColorSrt(std::string& fntColor);
 std::wstring MatchLanguage(const std::wstring& langCode, bool isCode2Chars = false);
-ASS_Track* srt_read_file(ASS_Library* library, char* fname, const AssFSettings& settings, const UINT codePage = 0);
+ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const AssFSettings& settings, const UINT codePage = 0);
 std::wstring ParseFontsPath(std::wstring fontsDir, const std::wstring& name);
 
 inline bool dirExists(const std::wstring& dirName)
