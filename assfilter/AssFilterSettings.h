@@ -25,6 +25,7 @@ struct AssFSettings
     std::wstring FontName;
     BOOL NativeSize;
     BOOL ScaledBorderAndShadow;
+    BOOL FontLigatures;
     DWORD FontSize;
     DWORD FontScaleX;
     DWORD FontScaleY;
