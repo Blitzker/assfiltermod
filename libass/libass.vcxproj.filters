@@ -43,9 +43,6 @@
     <ClCompile Include="upstream\libass\ass_fontselect.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="upstream\libass\ass_fontconfig.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="upstream\libass\ass_font.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -73,28 +70,25 @@
     <ClCompile Include="upstream\libass\ass_string.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="upstream\libass\ass_outline.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <YASM Include="upstream\libass\x86\be_blur.asm">
+    <NASM Include="upstream\libass\x86\be_blur.asm">
       <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\blend_bitmaps.asm">
+    </NASM>
+    <NASM Include="upstream\libass\x86\blend_bitmaps.asm">
       <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\blur.asm">
+    </NASM>
+    <NASM Include="upstream\libass\x86\blur.asm">
       <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\cpuid.asm">
+    </NASM>
+    <NASM Include="upstream\libass\x86\cpuid.asm">
       <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\rasterizer.asm">
+    </NASM>
+    <NASM Include="upstream\libass\x86\rasterizer.asm">
       <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\utils.asm">
-      <Filter>src\asm</Filter>
-    </YASM>
-    <YASM Include="upstream\libass\x86\x86inc.asm">
-      <Filter>src\asm</Filter>
-    </YASM>
+    </NASM>
   </ItemGroup>
 </Project>
