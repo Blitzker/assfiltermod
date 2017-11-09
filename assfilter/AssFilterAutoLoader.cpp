@@ -19,6 +19,7 @@
 #include "AssDebug.h"
 #include "AssFilter.h"
 #include "AssFilterAutoLoader.h"
+#include "registry.h"
 
 AFAutoLoaderDummyInputPin::AFAutoLoaderDummyInputPin(AssFilterAutoLoader *pFilter, CCritSec *pLock, HRESULT *pResult, LPCWSTR pName)
     : CBaseInputPin(NAME("DummyInputPin"), pFilter, pLock, pResult, pName)
@@ -191,6 +192,22 @@ bool AssFilterAutoLoader::AutoLoad(IFilterGraph* pGraph)
     return !have_subtitle_pin;
 }
 
+bool AssFilterAutoLoader::DisableAutoLoad()
+{
+    HRESULT hr;
+    BOOL bFlag;
+
+    CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr, TRUE);
+    if (SUCCEEDED(hr))
+    {
+        bFlag = reg.ReadBOOL(L"DisableAutoLoad", hr);
+        if (!SUCCEEDED(hr))
+            return false;
+    }
+
+    return bFlag ? true : false;
+}
+
 HRESULT AssFilterAutoLoader::CheckInput(const CMediaType* mt)
 {
     HRESULT hr = NOERROR;
@@ -220,7 +237,7 @@ HRESULT AssFilterAutoLoader::CheckInput(const CMediaType* mt)
             mt->majortype == MEDIATYPE_Subtitle ||
             mt->majortype == MEDIATYPE_Video)
         {
-            if (AutoLoad(m_pGraph))
+            if (AutoLoad(m_pGraph) && !DisableAutoLoad())
             {
                 DbgLog((LOG_TRACE, 1, L"AssFilterAutoLoader::CheckInput() -> Autoload"));
 

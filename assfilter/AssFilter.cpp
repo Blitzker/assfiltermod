@@ -684,6 +684,7 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.NativeSize = FALSE;
     m_settings.ScaledBorderAndShadow = TRUE;
     m_settings.FontLigatures = FALSE;
+    m_settings.DisableAutoLoad = FALSE;
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 18;
@@ -733,6 +734,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
 
         bFlag = reg.ReadBOOL(L"FontLigatures", hr);
         if (SUCCEEDED(hr)) m_settings.FontLigatures = bFlag;
+
+        bFlag = reg.ReadBOOL(L"DisableAutoLoad", hr);
+        if (SUCCEEDED(hr)) m_settings.DisableAutoLoad = bFlag;
 
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
@@ -822,6 +826,7 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
         reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
         reg.WriteBOOL(L"FontLigatures", m_settings.FontLigatures);
+        reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);

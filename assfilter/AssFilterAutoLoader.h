@@ -53,6 +53,7 @@ public:
     STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo) override;
 
     bool AutoLoad(IFilterGraph* pGraph);
+    bool DisableAutoLoad();
     HRESULT CheckInput(const CMediaType* mt);
 
 private:
