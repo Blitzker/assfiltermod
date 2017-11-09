@@ -51,6 +51,7 @@ namespace
 CFactoryTemplate g_Templates[] = {
     { setupFilter[0].strName, &__uuidof(AssFilter), AssFilter::CreateInstance, nullptr, &setupFilter[0] },
     { setupFilter[1].strName, &__uuidof(AssFilterAutoLoader), AssFilterAutoLoader::CreateInstance, nullptr, &setupFilter[1] },
+    { L"AssFilterGeneralProp", &__uuidof(CAssFilterGeneralProp), CAssFilterGeneralProp::CreateInstance, nullptr, nullptr },
     { L"AssFilterSettingsProp", &__uuidof(CAssFilterSettingsProp), CAssFilterSettingsProp::CreateInstance, nullptr, nullptr },
     { L"AssFilterStatusProp", &__uuidof(CAssFilterStatusProp), CAssFilterStatusProp::CreateInstance, nullptr, nullptr },
     { L"AssFilterAboutProp", &__uuidof(CAssFilterAboutProp), CAssFilterAboutProp::CreateInstance, nullptr, nullptr }

@@ -608,15 +608,16 @@ STDMETHODIMP AssFilter::GetPages(CAUUID *pPages)
     DbgLog((LOG_TRACE, 1, L"AssFilter::GetPages()"));
 
     CheckPointer(pPages, E_POINTER);
-    pPages->cElems = 3;
+    pPages->cElems = 4;
     pPages->pElems = (GUID*)CoTaskMemAlloc(sizeof(GUID) * pPages->cElems);
     if (pPages->pElems == nullptr)
     {
         return E_OUTOFMEMORY;
     }
-    pPages->pElems[0] = __uuidof(CAssFilterSettingsProp);
-    pPages->pElems[1] = __uuidof(CAssFilterStatusProp);
-    pPages->pElems[2] = __uuidof(CAssFilterAboutProp);
+    pPages->pElems[0] = __uuidof(CAssFilterGeneralProp);
+    pPages->pElems[1] = __uuidof(CAssFilterSettingsProp);
+    pPages->pElems[2] = __uuidof(CAssFilterStatusProp);
+    pPages->pElems[3] = __uuidof(CAssFilterAboutProp);
 
     return S_OK;
 }
@@ -631,7 +632,9 @@ STDMETHODIMP AssFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
     if (*ppPage != nullptr)
         return E_INVALIDARG;
 
-    if (guid == __uuidof(CAssFilterSettingsProp))
+    if (guid == __uuidof(CAssFilterGeneralProp))
+        *ppPage = new CAssFilterGeneralProp(nullptr, &hr);
+    else if (guid == __uuidof(CAssFilterSettingsProp))
         *ppPage = new CAssFilterSettingsProp(nullptr, &hr);
     else if (guid == __uuidof(CAssFilterStatusProp))
         *ppPage = new CAssFilterStatusProp(nullptr, &hr);

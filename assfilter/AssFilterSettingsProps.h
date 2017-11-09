@@ -116,3 +116,38 @@ public:
     INT_PTR OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 };
+
+class __declspec(uuid("C062587A-48BA-461A-91A4-0B791246F41E"))
+    CAssFilterGeneralProp : public CBasePropertyPage
+{
+private:
+    IAssFilterSettings *m_pAssFilterSettings = nullptr; // Pointer to the filter's custom interface.
+
+    AssFSettings        m_settings;                     // Settings
+
+    HRESULT LoadSettings();
+    HRESULT LoadDefaults();
+    HRESULT SaveSettings();
+
+    void SetDirty()
+    {
+        m_bDirty = TRUE;
+        if (m_pPageSite)
+        {
+            m_pPageSite->OnStatusChange(PROPPAGESTATUS_DIRTY);
+        }
+    }
+
+public:
+    CAssFilterGeneralProp(LPUNKNOWN pUnk, HRESULT *phr);
+    ~CAssFilterGeneralProp();
+
+    static CUnknown * WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT *phr);
+
+    HRESULT OnConnect(IUnknown *pUnk) override;
+    HRESULT OnDisconnect(void) override;
+    HRESULT OnActivate(void) override;
+    HRESULT OnApplyChanges(void) override;
+    INT_PTR OnReceiveMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
+};
