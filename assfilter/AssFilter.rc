@@ -58,7 +58,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 328
         TOPMARGIN, 7
-        BOTTOMMARGIN, 312
+        BOTTOMMARGIN, 303
     END
 
     IDD_PROPPAGE_STATUS, DIALOG
@@ -80,9 +80,9 @@ BEGIN
     IDD_PROPPAGE_GENERAL, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 343
+        RIGHTMARGIN, 328
         TOPMARGIN, 7
-        BOTTOMMARGIN, 190
+        BOTTOMMARGIN, 188
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -119,8 +119,8 @@ END
 // Dialog
 //
 
-IDD_PROPPAGE_SETTINGS DIALOGEX 0, 0, 336, 319
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_BORDER
+IDD_PROPPAGE_SETTINGS DIALOGEX 0, 0, 335, 310
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "Font Name",IDC_FONT_NAME,14,19,93,14
@@ -181,7 +181,7 @@ BEGIN
     PUSHBUTTON      "Button3",IDC_BUTTON_OUTLINE,227,103,35,14,NOT WS_TABSTOP
     PUSHBUTTON      "Button4",IDC_BUTTON_SHADOW,272,103,35,14,NOT WS_TABSTOP
     LTEXT           "The Media Player need to be restarted for the new settings to take effect.",IDC_STATIC,140,152,166,17
-    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,287,84,14
+    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,284,84,14
     CONTROL         "Scale Border and Shadow with Subtitles Resolution",IDC_BORDER_SHADOW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,225,177,10
     GROUPBOX        "Font Rendering Resolution",IDC_STATIC,7,182,313,35
@@ -192,7 +192,7 @@ BEGIN
 END
 
 IDD_PROPPAGE_STATUS DIALOGEX 0, 0, 245, 128
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_BORDER
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Track Name :",IDC_STATIC,16,20,45,8
@@ -210,33 +210,34 @@ BEGIN
 END
 
 IDD_PROPPAGE_ABOUT DIALOGEX 0, 0, 181, 154
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_DISABLED | WS_BORDER
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "name",IDC_APP_NAME,7,7,160,12
     LTEXT           "Based on AssFilter by Alex Marsev",IDC_STATIC,7,55,160,8
     LTEXT           "Credits:",IDC_STATIC,7,73,160,8
-    LTEXT           "Nevcairiel (Borrowed code from LAV Filters)",IDC_STATIC,7,83,160,8
-    LTEXT           "stackoverflow.com (Useful bits of code)",IDC_STATIC,7,93,160,8
+    LTEXT           "Nevcairiel (Code from LAV Filters)",IDC_STATIC,7,83,160,8
+    LTEXT           "www.stackoverflow.com (Useful bits of code)",IDC_STATIC,7,93,160,8
     CTEXT           "by Blitzker",IDC_STATIC,7,32,160,8
     CTEXT           "version",IDC_APP_VERSION,7,18,160,8
+    LTEXT           "www.iconarchive.com (system tray icon)",IDC_STATIC,7,103,160,8
 END
 
-IDD_PROPPAGE_GENERAL DIALOGEX 0, 0, 350, 197
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE | WS_BORDER
+IDD_PROPPAGE_GENERAL DIALOGEX 0, 0, 335, 195
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "General Settings",IDC_STATIC,7,7,327,90
+    GROUPBOX        "General Settings",IDC_STATIC,7,7,313,90
     CONTROL         "Disable Font Ligatures",IDC_FONT_LIGATURES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,20,87,10
-    GROUPBOX        "Ass Only Settings",IDC_STATIC,7,103,328,59
+    GROUPBOX        "Ass Only Settings",IDC_STATIC,7,103,313,59
     CONTROL         "Override Subtitles Resolution",IDC_NATIVE_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,66,109,10
-    GROUPBOX        "Custom Subtitles Resolution",IDC_STATIC,14,50,313,37
+    GROUPBOX        "Custom Subtitles Resolution",IDC_STATIC,14,50,298,37
     COMBOBOX        IDC_CUSTOM_RES,189,65,60,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "External Subtitles Fonts Folder",IDC_STATIC,14,115,313,37
-    EDITTEXT        IDC_FONTS_FOLDER,24,129,293,14,ES_AUTOHSCROLL
+    GROUPBOX        "External Subtitles Fonts Folder",IDC_STATIC,14,115,298,37
+    EDITTEXT        IDC_FONTS_FOLDER,24,129,279,14,ES_AUTOHSCROLL
     CONTROL         "Disable Auto-Load of External Subtitles",IDC_AUTO_LOAD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,141,10
-    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,125,168,84,14
+    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,168,84,14
 END
 
 

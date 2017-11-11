@@ -22,6 +22,7 @@
 #include "AssPin.h"
 #include "AssFilterSettingsProps.h"
 #include "registry.h"
+#include "resource.h"
 #include "SubFrame.h"
 #include "Tools.h"
 
@@ -83,6 +84,18 @@ CUnknown* WINAPI AssFilter::CreateInstance(LPUNKNOWN pUnk, HRESULT* pResult)
     }
 
     return nullptr;
+}
+
+STDMETHODIMP AssFilter::CreateTrayIcon()
+{
+    CAutoLock lock(this);
+
+    if (m_pTrayIcon)
+        return E_UNEXPECTED;
+
+    m_pTrayIcon = std::make_unique<CBaseTrayIcon>(this, TEXT("AssFilterMod"), IDI_ICON1);
+
+    return S_OK;
 }
 
 void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
@@ -396,6 +409,10 @@ STDMETHODIMP AssFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
         }
         if (wcscmp(pName, L"AssFilterMod(AutoLoad)") == 0)
             m_bExternalFile = true;
+
+        if (!m_pTrayIcon && m_settings.TrayIcon)
+            CreateTrayIcon();
+
         return hr;
     }
     else
@@ -411,6 +428,9 @@ STDMETHODIMP AssFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
             m_consumer = nullptr;
         }
         m_bNotFirstPause = false;
+
+        if (m_pTrayIcon)
+            m_pTrayIcon.reset();
 
         return __super::JoinFilterGraph(pGraph, pName);
     }

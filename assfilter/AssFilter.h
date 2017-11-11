@@ -19,6 +19,7 @@
 
 #include <ass.h>
 #include "AssFilterSettings.h"
+#include "BaseTrayIcon.h"
 #include "ISpecifyPropertyPages2.h"
 #include "Tools.h"
 
@@ -105,6 +106,8 @@ private:
     HRESULT LoadSettings();
     HRESULT SaveSettings();
 
+    STDMETHODIMP CreateTrayIcon();
+
     HRESULT ConnectToConsumer(IFilterGraph* pGraph);
     HRESULT LoadFonts(IPin* pPin);
     HRESULT LoadExternalFile();
@@ -145,4 +148,6 @@ private:
     };
 
     std::multimap<int, s_sub_line> mapSubLine;
+
+    std::unique_ptr<CBaseTrayIcon> m_pTrayIcon;
 };
