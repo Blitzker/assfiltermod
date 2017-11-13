@@ -180,9 +180,11 @@
     <ClCompile Include="AssFilter.cpp" />
     <ClCompile Include="AssFilterAutoLoader.cpp" />
     <ClCompile Include="AssFilterSettingsProps.cpp" />
+    <ClCompile Include="AssFilterTrayIcon.cpp" />
     <ClCompile Include="AssPin.cpp" />
     <ClCompile Include="BaseDSPropPage.cpp" />
     <ClCompile Include="BaseTrayIcon.cpp" />
+    <ClCompile Include="PopupMenu.cpp" />
     <ClCompile Include="registry.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -199,10 +201,13 @@
     <ClInclude Include="AssFilterAutoLoader.h" />
     <ClInclude Include="AssFilterSettings.h" />
     <ClInclude Include="AssFilterSettingsProps.h" />
+    <ClInclude Include="AssFilterTrayIcon.h" />
     <ClInclude Include="AssPin.h" />
     <ClInclude Include="BaseDSPropPage.h" />
     <ClInclude Include="BaseTrayIcon.h" />
+    <ClInclude Include="ExtSubStruct.h" />
     <ClInclude Include="ISpecifyPropertyPages2.h" />
+    <ClInclude Include="PopupMenu.h" />
     <ClInclude Include="registry.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />

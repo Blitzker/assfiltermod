@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <fstream>
+#include "stdafx.h"
+
 #include "ass.h"
 #include "AssFilterSettings.h"
 #include "utf8.h"
@@ -154,6 +155,7 @@ void MatchColorSrt(std::string& fntColor);
 std::wstring MatchLanguage(const std::wstring& langCode, bool isCode2Chars = false);
 ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const AssFSettings& settings, const UINT codePage = 0);
 std::wstring ParseFontsPath(std::wstring fontsDir, const std::wstring& name);
+std::vector<std::wstring> FindMatchingSubs(const std::wstring& fileName);
 
 inline bool dirExists(const std::wstring& dirName)
 {

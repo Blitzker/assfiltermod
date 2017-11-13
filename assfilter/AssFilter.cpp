@@ -49,6 +49,8 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
     m_bNotFirstPause = false;
     m_bNoExtFile = false;
     m_bUnsupportedSub = false;
+    m_iCurExtSubTrack = 0;
+    m_ExtSubFiles = {};
 
     LoadSettings();
 
@@ -93,7 +95,7 @@ STDMETHODIMP AssFilter::CreateTrayIcon()
     if (m_pTrayIcon)
         return E_UNEXPECTED;
 
-    m_pTrayIcon = std::make_unique<CBaseTrayIcon>(this, TEXT("AssFilterMod"), IDI_ICON1);
+    m_pTrayIcon = std::make_unique<CAssFilterTrayIcon>(this, TEXT("AssFilterMod"), IDI_ICON1, m_ExtSubFiles);
 
     return S_OK;
 }
@@ -138,6 +140,9 @@ void AssFilter::SetMediaType(const CMediaType& mt, IPin* pPin)
     m_wsTrackName.assign(psi->TrackName);
     std::wstring tmpIsoLang = s2ws(std::string(psi->IsoLang));
     m_wsTrackLang.assign(MatchLanguage(tmpIsoLang) + L" (" + tmpIsoLang + L")");
+
+    if (!m_pTrayIcon && m_settings.TrayIcon)
+        CreateTrayIcon();
 
     // SRT Media Sub-Type
     if (mt.subtype == MEDIASUBTYPE_UTF8)
@@ -341,6 +346,8 @@ STDMETHODIMP AssFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
         return GetInterface(static_cast<ISpecifyPropertyPages2*>(this), ppv);
     else if (riid == __uuidof(IAssFilterSettings))
         return GetInterface(static_cast<IAssFilterSettings*>(this), ppv);
+    else if (riid == __uuidof(IAFMExtSubtitles))
+        return GetInterface(static_cast<IAFMExtSubtitles*>(this), ppv);
 
     return __super::NonDelegatingQueryInterface(riid, ppv);
 }
@@ -410,9 +417,6 @@ STDMETHODIMP AssFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
         if (wcscmp(pName, L"AssFilterMod(AutoLoad)") == 0)
             m_bExternalFile = true;
 
-        if (!m_pTrayIcon && m_settings.TrayIcon)
-            CreateTrayIcon();
-
         return hr;
     }
     else
@@ -424,7 +428,6 @@ STDMETHODIMP AssFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
             {
                 DbgLog((LOG_TRACE, 1, L"AssFilter::JoinFilterGraph() -> Failed to disconnect consumer!", pName));
             }
-            CAutoLock lock(this);
             m_consumer = nullptr;
         }
         m_bNotFirstPause = false;
@@ -512,7 +515,9 @@ STDMETHODIMP AssFilter::RequestFrame(REFERENCE_TIME start, REFERENCE_TIME stop, 
 
     int frameChange = 0;
     ISubRenderFramePtr frame = new SubFrame(videoRect, m_consumerLastId++,
-                                            ass_render_frame(m_renderer.get(), m_track.get(), start / 10000, &frameChange));
+                                            ass_render_frame(m_renderer.get(),
+                                            m_bExternalFile ? m_extSubTrack[m_ExtSubFiles[m_iCurExtSubTrack].vecPos].get() : m_track.get(),
+                                            start / 10000, &frameChange));
     return m_consumer->DeliverFrame(start, stop, context, frame);
 }
 
@@ -673,6 +678,7 @@ STDMETHODIMP AssFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
     }
 }
 
+// IAssFilterSettings
 STDMETHODIMP AssFilter::GetTrackInfo(const WCHAR **pTrackName, const WCHAR **pTrackLang, const WCHAR **pSubType)
 {
     if (pTrackName)
@@ -694,6 +700,50 @@ STDMETHODIMP AssFilter::GetConsumerInfo(const WCHAR **pName, const WCHAR **pVers
 
     if (pVersion)
         *pVersion = m_wsConsumerVer.c_str();
+
+    return S_OK;
+}
+
+// IAFMExtSubtitles
+STDMETHODIMP_(int) AssFilter::GetCurExternalSub()
+{
+    return m_iCurExtSubTrack;
+}
+
+STDMETHODIMP AssFilter::SetCurExternalSub(int iCurExtSub)
+{
+    if ((iCurExtSub < 0) || (iCurExtSub >= m_ExtSubFiles.size()))
+        return E_INVALIDARG;
+
+    CAutoLock lock(this);
+
+    m_iCurExtSubTrack = iCurExtSub;
+    if (m_ExtSubFiles[m_iCurExtSubTrack].vecPos == SIZE_MAX)
+    {
+        if (m_ExtSubFiles[m_iCurExtSubTrack].subType == L"ASS")
+        {
+            m_track = decltype(m_track)(ass_read_file(m_ass.get(), const_cast<char*>(ws2s(m_ExtSubFiles[m_iCurExtSubTrack].subFile).c_str()), "UTF-8"));
+            m_ExtSubFiles[m_iCurExtSubTrack].yuvMatrix = ExtractYuvMatrix(m_ExtSubFiles[m_iCurExtSubTrack].subFile);
+        }
+        else
+        {
+            // Check if the file needs conversion to UTF-8
+            if ((m_ExtSubFiles[m_iCurExtSubTrack].codePage != 0) && isFileUTF8(m_ExtSubFiles[m_iCurExtSubTrack].subFile))
+                m_ExtSubFiles[m_iCurExtSubTrack].codePage = 0;
+            m_track = decltype(m_track)(srt_read_file(m_ass.get(), m_ExtSubFiles[m_iCurExtSubTrack].subFile, m_settings, m_ExtSubFiles[m_iCurExtSubTrack].codePage));
+        }
+        m_extSubTrack.push_back(std::move(m_track));
+        m_track.reset();
+        m_ExtSubFiles[m_iCurExtSubTrack].vecPos = m_extSubTrack.size() - 1;
+    }
+    m_stringOptions["yuvMatrix"] = m_ExtSubFiles[m_iCurExtSubTrack].yuvMatrix;
+    m_boolOptions["isMovable"] = m_ExtSubFiles[m_iCurExtSubTrack].subType == L"SRT" ? true : false;
+    m_wsTrackName = m_ExtSubFiles[m_iCurExtSubTrack].subFile;
+    m_wsTrackLang = m_ExtSubFiles[m_iCurExtSubTrack].subLang;
+    m_wsSubType = m_ExtSubFiles[m_iCurExtSubTrack].subType;
+
+    if (m_consumer)
+        m_consumer->Clear();
 
     return S_OK;
 }
@@ -973,78 +1023,76 @@ HRESULT AssFilter::LoadExternalFile()
 
     std::wstring name = extFileName.substr(0, extFileName.find_last_of(L'.') + 1);
 
+    // Get all subtitle files matching the media file name
+    std::vector<std::wstring> possibleSubFiles = FindMatchingSubs(name);
+
     // Try to find an external subtitle file
     // First try to find a filename with 2 letters language code in it (ex: subfile.en.ass)
     bool externalSubFound = false;
-    UINT codePage = GetACP();
-    DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> System CodePage is %u", codePage));
-    for (auto i = 0; i < _countof(iso639_lang); ++i)
+    DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> System CodePage is %u", GetACP()));
+    if (!possibleSubFiles.empty())
     {
-        if (fexists(std::wstring(name).append(iso639_lang[i].lang2).append(L".ass")))
+        externalSubFound = true;
+        for (auto j = 0; j < possibleSubFiles.size(); ++j)
         {
-            externalSubFound = true;
-            extFileName = std::wstring(name).append(iso639_lang[i].lang2).append(L".ass");
-            m_wsTrackLang.assign(iso639_lang[i].language).append(L" (").append(iso639_lang[i].lang3).append(L")");
-            m_wsSubType.assign(L"ASS");
-            break;
-        }
-        else if (fexists(std::wstring(name).append(iso639_lang[i].lang2).append(L".srt")))
-        {
-            externalSubFound = true;
-            extFileName = std::wstring(name).append(iso639_lang[i].lang2).append(L".srt");
-            m_wsTrackLang.assign(iso639_lang[i].language).append(L" (").append(iso639_lang[i].lang3).append(L")");
-            codePage = iso639_lang[i].codepage;
-            m_wsSubType.assign(L"SRT");
-            break;
-        }
-        // Try a filename without a 2 letters language code
-        if (i == _countof(iso639_lang) - 1)
-        {
-            if (fexists(std::wstring(name).append(L"ass")))
+            for (auto i = 0; i < _countof(iso639_lang); ++i)
             {
-                externalSubFound = true;
-                extFileName = std::wstring(name).append(L"ass");
-                m_wsTrackLang.assign(MatchLanguage(std::wstring(L"und")).append(L" (und)"));
-                m_wsSubType.assign(L"ASS");
-            }
-            else if (fexists(std::wstring(name).append(L"srt")))
-            {
-                externalSubFound = true;
-                extFileName = std::wstring(name).append(L"srt");
-                m_wsTrackLang.assign(MatchLanguage(std::wstring(L"und")).append(L" (und)"));
-                m_wsSubType.assign(L"SRT");
+                if (std::wstring(name).append(iso639_lang[i].lang2).append(L".ass") == possibleSubFiles[j])
+                {
+                    s_ext_sub extSub;
+                    extSub.subFile = std::wstring(name).append(iso639_lang[i].lang2).append(L".ass");
+                    extSub.subLang.assign(iso639_lang[i].language);
+                    extSub.subType.assign(L"ASS");
+                    extSub.yuvMatrix.assign(L"None");
+                    extSub.vecPos = SIZE_MAX;       // uninitialized
+                    m_ExtSubFiles.push_back(extSub);
+                }
+                else if (std::wstring(name).append(iso639_lang[i].lang2).append(L".srt") == possibleSubFiles[j])
+                {
+                    s_ext_sub extSub;
+                    extSub.subFile = std::wstring(name).append(iso639_lang[i].lang2).append(L".srt");
+                    extSub.subLang.assign(iso639_lang[i].language);
+                    extSub.codePage = iso639_lang[i].codepage;
+                    extSub.subType.assign(L"SRT");
+                    extSub.yuvMatrix.assign(L"None");
+                    extSub.vecPos = SIZE_MAX;       // uninitialized
+                    m_ExtSubFiles.push_back(extSub);
+                }
+                // Try a filename without a 2 letters language code
+                if (i == _countof(iso639_lang) - 1)
+                {
+                    if (std::wstring(name).append(L"ass") == possibleSubFiles[j])
+                    {
+                        s_ext_sub extSub;
+                        extSub.subFile = std::wstring(name).append(L"ass");
+                        extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                        extSub.subType.assign(L"ASS");
+                        extSub.yuvMatrix.assign(L"None");
+                        extSub.vecPos = SIZE_MAX;   // uninitialized
+                        m_ExtSubFiles.push_back(extSub);
+                    }
+                    else if (std::wstring(name).append(L"srt") == possibleSubFiles[j])
+                    {
+                        s_ext_sub extSub;
+                        extSub.subFile = std::wstring(name).append(L"srt");
+                        extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                        extSub.subType.assign(L"SRT");
+                        extSub.yuvMatrix.assign(L"None");
+                        extSub.codePage = GetACP();
+                        extSub.vecPos = SIZE_MAX;   // uninitialized
+                        m_ExtSubFiles.push_back(extSub);
+                    }
+                }
             }
         }
-    }
-    if (externalSubFound && m_wsSubType == L"ASS")
-    {
+
         ass_set_fonts_dir(m_ass.get(), ws2s(ParseFontsPath(m_settings.ExtraFontsDir, name)).c_str());
         ass_set_extract_fonts(m_ass.get(), TRUE);
-        m_track = decltype(m_track)(ass_read_file(m_ass.get(), const_cast<char*>(ws2s(extFileName).c_str()), "UTF-8"));
+        SetCurExternalSub(m_iCurExtSubTrack);
         ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
-        m_wsTrackName.assign(extFileName);
-        m_stringOptions["yuvMatrix"] = ExtractYuvMatrix(m_wsTrackName);
-        m_boolOptions["isMovable"] = false;
 
-        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> External ASS %s", extFileName.c_str()));
-        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> Extra Fonts %s", ParseFontsPath(m_settings.ExtraFontsDir, name).c_str()));
-    }
-    else if (externalSubFound && m_wsSubType == L"SRT")
-    {
-        // Check if the file needs conversion to UTF-8
-        if ((codePage != 0) && isFileUTF8(extFileName))
-        {
-            codePage = 0;
-            DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> File is UTF-8!"));
-        }
-        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> Using CodePage %u to convert to UTF-8!", codePage));
-        m_track = decltype(m_track)(srt_read_file(m_ass.get(), extFileName, m_settings, codePage));
-        ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
-        m_wsTrackName.assign(extFileName);
-        m_stringOptions["yuvMatrix"] = L"None";
-        m_boolOptions["isMovable"] = true;
-
-        DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> External SRT %s", extFileName.c_str()));
+        if (m_settings.TrayIcon)
+            CreateTrayIcon();
     }
     else
         return E_FAIL;

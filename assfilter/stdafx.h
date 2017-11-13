@@ -29,17 +29,29 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <streams.h>
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "SubRenderIntf.h"
 
 #define ASSFILTER_REGISTRY_KEY L"Software\\AssFilter"
 
 #define SAFE_DELETE(p)      if(p) { delete p; p = nullptr; }
+
+ // SafeRelease Template, for type safety
+template <class T> void SafeRelease(T **ppT)
+{
+    if (*ppT)
+    {
+        (*ppT)->Release();
+        *ppT = nullptr;
+    }
+}
 
 _COM_SMARTPTR_TYPEDEF(IBaseFilter, __uuidof(IBaseFilter));
 _COM_SMARTPTR_TYPEDEF(IEnumFilters, __uuidof(IEnumFilters));

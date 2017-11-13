@@ -19,7 +19,8 @@
 
 #include <ass.h>
 #include "AssFilterSettings.h"
-#include "BaseTrayIcon.h"
+#include "AssFilterTrayIcon.h"
+#include "ExtSubStruct.h"
 #include "ISpecifyPropertyPages2.h"
 #include "Tools.h"
 
@@ -32,6 +33,7 @@ AssFilter final
     , public ISubRenderProvider
     , public ISpecifyPropertyPages2
     , public IAssFilterSettings
+    , public IAFMExtSubtitles
 {
 public:
 
@@ -83,6 +85,10 @@ public:
     // IAssFilterSettings
     STDMETHODIMP GetTrackInfo(const WCHAR **pTrackName, const WCHAR **pTrackLang, const WCHAR **pSubType) override;
     STDMETHODIMP GetConsumerInfo(const WCHAR **pName, const WCHAR **pVersion) override;
+
+    // IAFMExtSubtitles
+    STDMETHODIMP_(int) GetCurExternalSub();
+    STDMETHODIMP SetCurExternalSub(int iCurExtSub);
 
 private:
 
@@ -149,5 +155,8 @@ private:
 
     std::multimap<int, s_sub_line> mapSubLine;
 
-    std::unique_ptr<CBaseTrayIcon> m_pTrayIcon;
+    int m_iCurExtSubTrack;
+    std::vector<std::unique_ptr<ASS_Track, ASS_TrackDeleter>> m_extSubTrack;
+    std::vector<s_ext_sub> m_ExtSubFiles;
+    std::unique_ptr<CAssFilterTrayIcon> m_pTrayIcon;
 };

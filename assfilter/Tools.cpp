@@ -626,3 +626,30 @@ std::wstring ParseFontsPath(std::wstring fontsDir, const std::wstring& name)
 
     return fontsDir;
 }
+
+std::vector<std::wstring> FindMatchingSubs(const std::wstring& fileName)
+{
+    std::vector<std::wstring> names;
+    std::wstring search_path = fileName + L"*";
+    WIN32_FIND_DATAW fd;
+    HANDLE hFind = FindFirstFileW(search_path.c_str(), &fd);
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                std::wstring fn(fd.cFileName);
+                std::transform(fn.begin(), fn.end(), fn.begin(), ::towlower);
+                if ((fn.find(L".ass", fn.find_last_of(L'.')) != std::wstring::npos) || (fn.find(L".srt", fn.find_last_of(L'.')) != std::wstring::npos))
+                {
+                    std::wstring tmp = fileName.substr(fileName.find_last_of(L'\\'));
+                    std::wstring ext = fn.substr(tmp.size() - 1);
+                    names.push_back(fileName + ext);
+                }
+            }
+        } while (FindNextFileW(hFind, &fd));
+        FindClose(hFind);
+    }
+    return names;
+}
