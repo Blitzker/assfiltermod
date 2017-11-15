@@ -156,6 +156,7 @@ std::wstring MatchLanguage(const std::wstring& langCode, bool isCode2Chars = fal
 ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const AssFSettings& settings, const UINT codePage = 0);
 std::wstring ParseFontsPath(std::wstring fontsDir, const std::wstring& name);
 std::vector<std::wstring> FindMatchingSubs(const std::wstring& fileName);
+std::vector<std::wstring> ListFontsInFolder(const std::wstring& folder);
 
 inline bool dirExists(const std::wstring& dirName)
 {

@@ -21,6 +21,7 @@
 #include "AssFilterSettings.h"
 #include "AssFilterTrayIcon.h"
 #include "ExtSubStruct.h"
+#include "FontInstaller.h"
 #include "ISpecifyPropertyPages2.h"
 #include "Tools.h"
 
@@ -159,4 +160,6 @@ private:
     std::vector<std::unique_ptr<ASS_Track, ASS_TrackDeleter>> m_extSubTrack;
     std::vector<s_ext_sub> m_ExtSubFiles;
     std::unique_ptr<CAssFilterTrayIcon> m_pTrayIcon;
+
+    std::unique_ptr<CFontInstaller> m_pFontInstaller;
 };

@@ -184,6 +184,7 @@
     <ClCompile Include="AssPin.cpp" />
     <ClCompile Include="BaseDSPropPage.cpp" />
     <ClCompile Include="BaseTrayIcon.cpp" />
+    <ClCompile Include="FontInstaller.cpp" />
     <ClCompile Include="PopupMenu.cpp" />
     <ClCompile Include="registry.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -206,6 +207,7 @@
     <ClInclude Include="BaseDSPropPage.h" />
     <ClInclude Include="BaseTrayIcon.h" />
     <ClInclude Include="ExtSubStruct.h" />
+    <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="ISpecifyPropertyPages2.h" />
     <ClInclude Include="PopupMenu.h" />
     <ClInclude Include="registry.h" />

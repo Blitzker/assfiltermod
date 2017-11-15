@@ -1086,6 +1086,12 @@ HRESULT AssFilter::LoadExternalFile()
             }
         }
 
+        // Install the fonts
+        m_pFontInstaller = std::make_unique<CFontInstaller>();
+        std::vector<std::wstring> fonts = ListFontsInFolder(ParseFontsPath(m_settings.ExtraFontsDir, name));
+        for (const auto& font : fonts)
+            m_pFontInstaller->InstallFont(font);
+
         ass_set_fonts_dir(m_ass.get(), ws2s(ParseFontsPath(m_settings.ExtraFontsDir, name)).c_str());
         ass_set_extract_fonts(m_ass.get(), TRUE);
         SetCurExternalSub(m_iCurExtSubTrack);

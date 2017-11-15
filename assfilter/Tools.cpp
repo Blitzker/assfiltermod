@@ -653,3 +653,32 @@ std::vector<std::wstring> FindMatchingSubs(const std::wstring& fileName)
     }
     return names;
 }
+
+std::vector<std::wstring> ListFontsInFolder(const std::wstring& folder)
+{
+    std::vector<std::wstring> names;
+    std::wstring search_path = folder + L"\\*.*";
+    WIN32_FIND_DATA fd;
+    HANDLE hFind = FindFirstFileW(search_path.c_str(), &fd);
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            // read all (real) files in current folder
+            // , delete '!' read other 2 default folder . and ..
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                std::wstring fn(fd.cFileName);
+                std::transform(fn.begin(), fn.end(), fn.begin(), ::towlower);
+                if ((fn.find(L".otf", fn.find_last_of(L'.')) != std::wstring::npos) || (fn.find(L".ttf", fn.find_last_of(L'.')) != std::wstring::npos))
+                {
+                    std::wstring tmp = folder;
+                    tmp.append(fd.cFileName);
+                    names.push_back(tmp);
+                }
+            }
+        } while (FindNextFileW(hFind, &fd));
+        FindClose(hFind);
+    }
+    return names;
+}
