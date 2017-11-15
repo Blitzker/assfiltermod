@@ -54,7 +54,7 @@ AssFilter::AssFilter(LPUNKNOWN pUnk, HRESULT* pResult)
 
     LoadSettings();
 
-    ass_set_font_ligatures(m_renderer.get(), m_settings.FontLigatures);
+    ass_set_font_ligatures(m_renderer.get(), m_settings.DisableFontLigatures);
 
 #ifdef DEBUG
     DbgSetModuleLevel(LOG_ERROR, DWORD_MAX);
@@ -753,7 +753,7 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.TrayIcon = FALSE;
     m_settings.NativeSize = FALSE;
     m_settings.ScaledBorderAndShadow = TRUE;
-    m_settings.FontLigatures = FALSE;
+    m_settings.DisableFontLigatures = FALSE;
     m_settings.DisableAutoLoad = FALSE;
 
     m_settings.FontName = L"Arial";
@@ -802,8 +802,8 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
         bFlag = reg.ReadBOOL(L"ScaledBorderAndShadow", hr);
         if (SUCCEEDED(hr)) m_settings.ScaledBorderAndShadow = bFlag;
 
-        bFlag = reg.ReadBOOL(L"FontLigatures", hr);
-        if (SUCCEEDED(hr)) m_settings.FontLigatures = bFlag;
+        bFlag = reg.ReadBOOL(L"DisableFontLigatures", hr);
+        if (SUCCEEDED(hr)) m_settings.DisableFontLigatures = bFlag;
 
         bFlag = reg.ReadBOOL(L"DisableAutoLoad", hr);
         if (SUCCEEDED(hr)) m_settings.DisableAutoLoad = bFlag;
@@ -895,7 +895,7 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
         reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
         reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
-        reg.WriteBOOL(L"FontLigatures", m_settings.FontLigatures);
+        reg.WriteBOOL(L"DisableFontLigatures", m_settings.DisableFontLigatures);
         reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);

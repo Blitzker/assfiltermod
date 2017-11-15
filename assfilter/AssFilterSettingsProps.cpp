@@ -1276,7 +1276,7 @@ HRESULT CAssFilterGeneralProp::OnActivate(void)
     hr = LoadSettings();
     if (SUCCEEDED(hr))
     {
-        SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.FontLigatures, 0);
+        SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.DisableFontLigatures, 0);
         SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_SETCHECK, m_settings.DisableAutoLoad, 0);
         SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_SETCHECK, m_settings.NativeSize, 0);
 
@@ -1301,7 +1301,7 @@ HRESULT CAssFilterGeneralProp::OnApplyChanges(void)
     HRESULT hr = S_OK;
 
     // Sanity check before saving the settings
-    m_settings.FontLigatures = (BOOL)SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_GETCHECK, 0, 0);
+    m_settings.DisableFontLigatures = (BOOL)SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_GETCHECK, 0, 0);
     m_settings.DisableAutoLoad = (BOOL)SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_GETCHECK, 0, 0);
     m_settings.NativeSize = (BOOL)SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_GETCHECK, 0, 0);
 
@@ -1327,8 +1327,8 @@ HRESULT CAssFilterGeneralProp::LoadSettings()
         bFlag = reg.ReadBOOL(L"NativeSize", hr);
         if (SUCCEEDED(hr)) m_settings.NativeSize = bFlag;
 
-        bFlag = reg.ReadBOOL(L"FontLigatures", hr);
-        if (SUCCEEDED(hr)) m_settings.FontLigatures = bFlag;
+        bFlag = reg.ReadBOOL(L"DisableFontLigatures", hr);
+        if (SUCCEEDED(hr)) m_settings.DisableFontLigatures = bFlag;
 
         bFlag = reg.ReadBOOL(L"DisableAutoLoad", hr);
         if (SUCCEEDED(hr)) m_settings.DisableAutoLoad = bFlag;
@@ -1346,13 +1346,13 @@ HRESULT CAssFilterGeneralProp::LoadSettings()
 HRESULT CAssFilterGeneralProp::LoadDefaults()
 {
     m_settings.NativeSize = FALSE;
-    m_settings.FontLigatures = FALSE;
+    m_settings.DisableFontLigatures = FALSE;
     m_settings.DisableAutoLoad = FALSE;
 
     m_settings.CustomRes = 0;
     m_settings.ExtraFontsDir = L"{FILE_DIR}";
 
-    SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.FontLigatures, 0);
+    SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.DisableFontLigatures, 0);
     SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_SETCHECK, m_settings.NativeSize, 0);
     SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_SETCHECK, m_settings.DisableAutoLoad, 0);
 
@@ -1372,7 +1372,7 @@ HRESULT CAssFilterGeneralProp::SaveSettings()
     if (SUCCEEDED(hr))
     {
         reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
-        reg.WriteBOOL(L"FontLigatures", m_settings.FontLigatures);
+        reg.WriteBOOL(L"DisableFontLigatures", m_settings.DisableFontLigatures);
         reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
         reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
         reg.WriteString(L"ExtraFontsDir", m_settings.ExtraFontsDir.c_str());
