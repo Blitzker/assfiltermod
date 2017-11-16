@@ -1,3 +1,18 @@
+v0.4
+- add: System tray icon
+- add: Selection of external subtitles in context menu of tray icon
+- add: Open settings by left click on the tray icon
+- add: Use of fonts in External Subs Fonts folder for SRT subtitles
+- add: Libass is built with harfbuzz support
+- add: Support of font ligatures
+- add: Option to disable auto-load of external subtitles
+- fix: Auto-load of subtitles with unicode characters
+- fix: Auto-load of SRT subtitles on a different codepage than en_us
+- Settings page is now split in two: General Settings and SRT Settings
+- Add support for Visual Studio 2017
+- Use my fork of libass
+- Update libass asm building tools : Now use nasm instead of yasm
+
 v0.3
 - add: Reset Settings button
 - add: Auto-load of external subtitles
