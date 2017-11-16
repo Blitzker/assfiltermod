@@ -143,6 +143,8 @@ void FindReplace(T& line, const T& oldString, const T& newString);
 std::wstring s2ws(const std::string& str);
 std::string ws2s(const std::wstring& wstr);
 
+void tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters = L" ", bool trimEmpty = true);
+
 void ConvertCPToUTF8(UINT CP, std::string& codepage_str);
 UINT GetLanguageCP(const std::wstring& langCode, bool isCode2Chars = false);
 
@@ -192,6 +194,12 @@ inline std::string& rtrim(std::string& s, const char* t = " \t\n\r")
     return s;
 }
 
+inline std::wstring& rtrim(std::wstring& s, const wchar_t* t = L" \t\n\r")
+{
+    s.erase(s.find_last_not_of(t) + 1);
+    return s;
+}
+
 // trim from beginning of string (left)
 inline std::string& ltrim(std::string& s, const char* t = " \t\n\r")
 {
@@ -199,8 +207,19 @@ inline std::string& ltrim(std::string& s, const char* t = " \t\n\r")
     return s;
 }
 
+inline std::wstring& ltrim(std::wstring& s, const wchar_t* t = L" \t\n\r")
+{
+    s.erase(0, s.find_first_not_of(t));
+    return s;
+}
+
 // trim from both ends of string (left & right)
 inline std::string& trim(std::string& s, const char* t = " \t\n\r")
+{
+    return ltrim(rtrim(s, t), t);
+}
+
+inline std::wstring& trim(std::wstring& s, const wchar_t* t = L" \t\n\r")
 {
     return ltrim(rtrim(s, t), t);
 }
@@ -213,4 +232,11 @@ inline void swapRGBtoBGR(std::string& color)
     color[1] = tmp[5];
     color[4] = tmp[0];
     color[5] = tmp[1];
+}
+
+template<typename TString>
+inline bool EndsWith(const TString& str, const TString& end)
+{
+    if (end.size() > str.size()) return false;
+    return std::equal(end.rbegin(), end.rend(), str.rbegin());
 }

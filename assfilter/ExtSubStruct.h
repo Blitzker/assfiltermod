@@ -20,6 +20,7 @@
 // External subtitles
 struct s_ext_sub
 {
+    std::wstring subAltName;
     std::wstring subFile;
     std::wstring subLang;
     std::wstring subType;
@@ -35,6 +36,9 @@ DEFINE_GUID(IID_IAFMExtSubtitles,
 interface __declspec(uuid("41E2AAD5-7574-407D-9740-2596C3C4D7C9"))
 IAFMExtSubtitles : public IUnknown
 {
+    // Get the total # of external subtitles found
+    STDMETHOD_(int, GetTotalExternalSubs)() = 0;
+
     // Get the id of the current loaded external subtitle
     STDMETHOD_(int, GetCurExternalSub)() = 0;
 

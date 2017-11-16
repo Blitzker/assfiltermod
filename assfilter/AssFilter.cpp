@@ -380,6 +380,9 @@ STDMETHODIMP AssFilter::Pause()
         {
             if (FAILED(LoadExternalFile()))
                 m_bNoExtFile = true;
+
+            if (m_settings.TrayIcon)
+                CreateTrayIcon();
         }
 
         m_bNotFirstPause = true;
@@ -705,6 +708,11 @@ STDMETHODIMP AssFilter::GetConsumerInfo(const WCHAR **pName, const WCHAR **pVers
 }
 
 // IAFMExtSubtitles
+STDMETHODIMP_(int) AssFilter::GetTotalExternalSubs()
+{
+    return static_cast<int>(m_ExtSubFiles.size());
+}
+
 STDMETHODIMP_(int) AssFilter::GetCurExternalSub()
 {
     return m_iCurExtSubTrack;
@@ -779,6 +787,7 @@ HRESULT AssFilter::LoadDefaults()
 
     m_settings.CustomTags = L"";
     m_settings.ExtraFontsDir = L"{FILE_DIR}";
+    m_settings.ExtraSubsDir = L"Subs";
 
     return S_OK;
 }
@@ -870,6 +879,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
 
         strVal = reg.ReadString(L"ExtraFontsDir", hr);
         if (SUCCEEDED(hr)) m_settings.ExtraFontsDir = strVal;
+
+        strVal = reg.ReadString(L"ExtraSubsDir", hr);
+        if (SUCCEEDED(hr)) m_settings.ExtraSubsDir = strVal;
     }
     else
         SaveSettings();
@@ -918,6 +930,7 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteDWORD(L"SrtResY", m_settings.SrtResY);
         reg.WriteString(L"CustomTags", m_settings.CustomTags.c_str());
         reg.WriteString(L"ExtraFontsDir", m_settings.ExtraFontsDir.c_str());
+        reg.WriteString(L"ExtraSubsDir", m_settings.ExtraSubsDir.c_str());
     }
 
     return S_OK;
@@ -1021,84 +1034,170 @@ HRESULT AssFilter::LoadExternalFile()
         }
     }
 
-    std::wstring name = extFileName.substr(0, extFileName.find_last_of(L'.') + 1);
+    std::wstring mediaNameWithoutExt = extFileName.substr(0, extFileName.find_last_of(L'.') + 1);
 
-    // Get all subtitle files matching the media file name
-    std::vector<std::wstring> possibleSubFiles = FindMatchingSubs(name);
+    // Get all subtitle files matching the media file name in the same folder
+    std::vector<std::wstring> mediaDirSubFiles = FindMatchingSubs(mediaNameWithoutExt);
+
+    // Get all subtitle files located in the extra folders
+    std::vector<std::wstring> extraDirSubFiles;
+    std::vector<std::wstring> extraFolders;
+    std::wstring lcExtraSubsDir(m_settings.ExtraSubsDir);
+    std::transform(lcExtraSubsDir.begin(), lcExtraSubsDir.end(), lcExtraSubsDir.begin(), ::towlower);
+    tokenize(m_settings.ExtraSubsDir, extraFolders, std::wstring(L";"));
+
+    // Remove duplicates
+    std::sort(extraFolders.begin(), extraFolders.end());
+    extraFolders.erase(std::unique(extraFolders.begin(), extraFolders.end()), extraFolders.end());
+    for (auto i = 0; i < extraFolders.size(); ++i)
+    {
+        std::vector<std::wstring> possibleSubFiles;
+        trim(extraFolders[i]);
+        if (!extraFolders[i].empty() && extraFolders[i] != L".")
+        {
+            std::wstring extraSubsFolder(mediaNameWithoutExt.substr(0, mediaNameWithoutExt.find_last_of(L'\\') + 1) + extraFolders[i] + L"\\");
+            possibleSubFiles = FindMatchingSubs(extraSubsFolder);
+        }
+        if (!possibleSubFiles.empty())
+            extraDirSubFiles.insert(std::end(extraDirSubFiles), std::begin(possibleSubFiles), std::end(possibleSubFiles));
+    }
 
     // Try to find an external subtitle file
-    // First try to find a filename with 2 letters language code in it (ex: subfile.en.ass)
-    bool externalSubFound = false;
     DbgLog((LOG_TRACE, 1, L"AssFilter::LoadExternalFile() -> System CodePage is %u", GetACP()));
-    if (!possibleSubFiles.empty())
+    if (!mediaDirSubFiles.empty() || !extraDirSubFiles.empty())
     {
-        externalSubFound = true;
-        for (auto j = 0; j < possibleSubFiles.size(); ++j)
+        // Work with lowercase for the compares
+        std::wstring lcName(mediaNameWithoutExt);
+        std::transform(lcName.begin(), lcName.end(), lcName.begin(), ::towlower);
+        for (auto j = 0; j < mediaDirSubFiles.size(); ++j)
         {
+            bool bSubFound = false;
+            std::wstring lcSubFile(mediaDirSubFiles[j]);
+            std::transform(lcSubFile.begin(), lcSubFile.end(), lcSubFile.begin(), ::towlower);
             for (auto i = 0; i < _countof(iso639_lang); ++i)
             {
-                if (std::wstring(name).append(iso639_lang[i].lang2).append(L".ass") == possibleSubFiles[j])
+                if (std::wstring(lcName).append(iso639_lang[i].lang2).append(L".ass") == lcSubFile)
                 {
                     s_ext_sub extSub;
-                    extSub.subFile = std::wstring(name).append(iso639_lang[i].lang2).append(L".ass");
+                    extSub.subFile = mediaDirSubFiles[j];
                     extSub.subLang.assign(iso639_lang[i].language);
                     extSub.subType.assign(L"ASS");
                     extSub.yuvMatrix.assign(L"None");
                     extSub.vecPos = SIZE_MAX;       // uninitialized
                     m_ExtSubFiles.push_back(extSub);
+                    bSubFound = true;
+                    break;
                 }
-                else if (std::wstring(name).append(iso639_lang[i].lang2).append(L".srt") == possibleSubFiles[j])
+                else if (std::wstring(lcName).append(iso639_lang[i].lang2).append(L".srt") == lcSubFile)
                 {
                     s_ext_sub extSub;
-                    extSub.subFile = std::wstring(name).append(iso639_lang[i].lang2).append(L".srt");
+                    extSub.subFile = mediaDirSubFiles[j];
                     extSub.subLang.assign(iso639_lang[i].language);
                     extSub.codePage = iso639_lang[i].codepage;
                     extSub.subType.assign(L"SRT");
                     extSub.yuvMatrix.assign(L"None");
                     extSub.vecPos = SIZE_MAX;       // uninitialized
                     m_ExtSubFiles.push_back(extSub);
+                    bSubFound = true;
+                    break;
                 }
                 // Try a filename without a 2 letters language code
                 if (i == _countof(iso639_lang) - 1)
                 {
-                    if (std::wstring(name).append(L"ass") == possibleSubFiles[j])
+                    if (std::wstring(lcName).append(L"ass") == lcSubFile)
                     {
                         s_ext_sub extSub;
-                        extSub.subFile = std::wstring(name).append(L"ass");
+                        extSub.subFile = mediaDirSubFiles[j];
                         extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
                         extSub.subType.assign(L"ASS");
                         extSub.yuvMatrix.assign(L"None");
                         extSub.vecPos = SIZE_MAX;   // uninitialized
                         m_ExtSubFiles.push_back(extSub);
+                        bSubFound = true;
                     }
-                    else if (std::wstring(name).append(L"srt") == possibleSubFiles[j])
+                    else if (std::wstring(lcName).append(L"srt") == lcSubFile)
                     {
                         s_ext_sub extSub;
-                        extSub.subFile = std::wstring(name).append(L"srt");
+                        extSub.subFile = mediaDirSubFiles[j];
                         extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
                         extSub.subType.assign(L"SRT");
                         extSub.yuvMatrix.assign(L"None");
                         extSub.codePage = GetACP();
                         extSub.vecPos = SIZE_MAX;   // uninitialized
                         m_ExtSubFiles.push_back(extSub);
+                        bSubFound = true;
                     }
+                }
+            }
+            // Subtitle not matching any language
+            if (!bSubFound)
+            {
+                if (EndsWith(lcSubFile, std::wstring(L".ass")))
+                {
+                    s_ext_sub extSub;
+                    extSub.subAltName = mediaDirSubFiles[j].substr(mediaNameWithoutExt.size(), mediaDirSubFiles[j].size() - mediaNameWithoutExt.size() - 4);
+                    extSub.subFile = mediaDirSubFiles[j];
+                    extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                    extSub.subType.assign(L"ASS");
+                    extSub.yuvMatrix.assign(L"None");
+                    extSub.vecPos = SIZE_MAX;   // uninitialized
+                    m_ExtSubFiles.push_back(extSub);
+                }
+                else
+                {
+                    s_ext_sub extSub;
+                    extSub.subAltName = mediaDirSubFiles[j].substr(mediaNameWithoutExt.size(), mediaDirSubFiles[j].size() - mediaNameWithoutExt.size() - 4);
+                    extSub.subFile = mediaDirSubFiles[j];
+                    extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                    extSub.subType.assign(L"SRT");
+                    extSub.yuvMatrix.assign(L"None");
+                    extSub.codePage = GetACP();
+                    extSub.vecPos = SIZE_MAX;   // uninitialized
+                    m_ExtSubFiles.push_back(extSub);
                 }
             }
         }
 
+        // Check external subtitles folders
+        for (auto j = 0; j < extraDirSubFiles.size(); ++j)
+        {
+            // Work with lowercase for the compares
+            std::wstring lcName(extraDirSubFiles[j]);
+            std::transform(lcName.begin(), lcName.end(), lcName.begin(), ::towlower);
+            if (EndsWith(lcName, std::wstring(L".ass")))
+            {
+                s_ext_sub extSub;
+                extSub.subAltName = extraDirSubFiles[j].substr(extraDirSubFiles[j].find_last_of(L'\\') + 1, extraDirSubFiles[j].size() - extraDirSubFiles[j].find_last_of(L'\\') - 5);
+                extSub.subFile = extraDirSubFiles[j];
+                extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                extSub.subType.assign(L"ASS");
+                extSub.yuvMatrix.assign(L"None");
+                extSub.vecPos = SIZE_MAX;   // uninitialized
+                m_ExtSubFiles.push_back(extSub);
+            }
+            else
+            {
+                s_ext_sub extSub;
+                extSub.subAltName = extraDirSubFiles[j].substr(extraDirSubFiles[j].find_last_of(L'\\') + 1, extraDirSubFiles[j].size() - extraDirSubFiles[j].find_last_of(L'\\') - 5);
+                extSub.subFile = extraDirSubFiles[j];
+                extSub.subLang.assign(MatchLanguage(std::wstring(L"und")));
+                extSub.subType.assign(L"SRT");
+                extSub.yuvMatrix.assign(L"None");
+                extSub.codePage = GetACP();
+                extSub.vecPos = SIZE_MAX;   // uninitialized
+                m_ExtSubFiles.push_back(extSub);
+            }
+        }
         // Install the fonts
         m_pFontInstaller = std::make_unique<CFontInstaller>();
-        std::vector<std::wstring> fonts = ListFontsInFolder(ParseFontsPath(m_settings.ExtraFontsDir, name));
+        std::vector<std::wstring> fonts = ListFontsInFolder(ParseFontsPath(m_settings.ExtraFontsDir, mediaNameWithoutExt));
         for (const auto& font : fonts)
             m_pFontInstaller->InstallFont(font);
 
-        ass_set_fonts_dir(m_ass.get(), ws2s(ParseFontsPath(m_settings.ExtraFontsDir, name)).c_str());
+        ass_set_fonts_dir(m_ass.get(), ws2s(ParseFontsPath(m_settings.ExtraFontsDir, mediaNameWithoutExt)).c_str());
         ass_set_extract_fonts(m_ass.get(), TRUE);
         SetCurExternalSub(m_iCurExtSubTrack);
         ass_set_fonts(m_renderer.get(), NULL, NULL, ASS_FONTPROVIDER_DIRECTWRITE, NULL, NULL);
-
-        if (m_settings.TrayIcon)
-            CreateTrayIcon();
     }
     else
         return E_FAIL;

@@ -17,7 +17,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include <Commctrl.h>
+
 #include "AssFilterSettingsProps.h"
 #include "registry.h"
 #include "Tools.h"
@@ -1290,6 +1290,7 @@ HRESULT CAssFilterGeneralProp::OnActivate(void)
         EnableWindow(GetDlgItem(m_Dlg, IDC_CUSTOM_RES), m_settings.NativeSize);
 
         SendDlgItemMessage(m_Dlg, IDC_FONTS_FOLDER, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraFontsDir.c_str());
+        SendDlgItemMessage(m_Dlg, IDC_SUBS_FOLDER, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraSubsDir.c_str());
     }
 
     return hr;
@@ -1310,6 +1311,9 @@ HRESULT CAssFilterGeneralProp::OnApplyChanges(void)
     WCHAR wsCustomBuffer[1024];
     SendDlgItemMessage(m_Dlg, IDC_FONTS_FOLDER, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
     m_settings.ExtraFontsDir.assign(wsCustomBuffer);
+
+    SendDlgItemMessage(m_Dlg, IDC_SUBS_FOLDER, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
+    m_settings.ExtraSubsDir.assign(wsCustomBuffer);
 
     return SaveSettings();
 }
@@ -1338,6 +1342,9 @@ HRESULT CAssFilterGeneralProp::LoadSettings()
 
         strVal = reg.ReadString(L"ExtraFontsDir", hr);
         if (SUCCEEDED(hr)) m_settings.ExtraFontsDir = strVal;
+
+        strVal = reg.ReadString(L"ExtraSubsDir", hr);
+        if (SUCCEEDED(hr)) m_settings.ExtraSubsDir = strVal;
     }
 
     return S_OK;
@@ -1351,6 +1358,7 @@ HRESULT CAssFilterGeneralProp::LoadDefaults()
 
     m_settings.CustomRes = 0;
     m_settings.ExtraFontsDir = L"{FILE_DIR}";
+    m_settings.ExtraSubsDir = L"Subs";
 
     SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.DisableFontLigatures, 0);
     SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_SETCHECK, m_settings.NativeSize, 0);
@@ -1360,6 +1368,7 @@ HRESULT CAssFilterGeneralProp::LoadDefaults()
     EnableWindow(GetDlgItem(m_Dlg, IDC_CUSTOM_RES), m_settings.NativeSize);
 
     SendDlgItemMessage(m_Dlg, IDC_FONTS_FOLDER, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraFontsDir.c_str());
+    SendDlgItemMessage(m_Dlg, IDC_SUBS_FOLDER, WM_SETTEXT, 0, (LPARAM)m_settings.ExtraSubsDir.c_str());
 
     return S_OK;
 }
@@ -1376,6 +1385,7 @@ HRESULT CAssFilterGeneralProp::SaveSettings()
         reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
         reg.WriteDWORD(L"CustomRes", m_settings.CustomRes);
         reg.WriteString(L"ExtraFontsDir", m_settings.ExtraFontsDir.c_str());
+        reg.WriteString(L"ExtraSubsDir", m_settings.ExtraSubsDir.c_str());
     }
 
     return S_OK;
@@ -1405,6 +1415,13 @@ INT_PTR CAssFilterGeneralProp::OnReceiveMessage(HWND hwnd,
             WCHAR wsCustomBuffer[1024];
             SendDlgItemMessage(m_Dlg, LOWORD(wParam), WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
             if (wcscmp(wsCustomBuffer, m_settings.ExtraFontsDir.c_str()) != 0)
+                SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_SUBS_FOLDER && HIWORD(wParam) == EN_CHANGE)
+        {
+            WCHAR wsCustomBuffer[1024];
+            SendDlgItemMessage(m_Dlg, LOWORD(wParam), WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
+            if (wcscmp(wsCustomBuffer, m_settings.ExtraSubsDir.c_str()) != 0)
                 SetDirty();
         }
         else if (HIWORD(wParam) == CBN_SELCHANGE && LOWORD(wParam) == IDC_CUSTOM_RES)

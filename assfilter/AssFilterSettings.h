@@ -48,6 +48,7 @@ struct AssFSettings
 
     std::wstring CustomTags;
     std::wstring ExtraFontsDir;
+    std::wstring ExtraSubsDir;
 };
 
 // AssFilter Settings Interface

@@ -17,8 +17,6 @@
 
 #include "stdafx.h"
 
-#include <algorithm>
-#include <codecvt>
 #include <Shlwapi.h>
 
 #include "Tools.h"
@@ -49,6 +47,26 @@ void FindReplace(T& line, const T& oldString, const T& newString)
             line.erase(pos, oldSize);
             line.insert(pos, newString);
         }
+    }
+}
+
+void tokenize(const std::wstring& str, std::vector<std::wstring>& tokens, const std::wstring& delimiters, bool trimEmpty)
+{
+    std::wstring::size_type pos, lastPos = 0, length = str.length();
+
+    using value_type = typename std::vector<std::wstring>::value_type;
+    using size_type = typename std::vector<std::wstring>::size_type;
+
+    while (lastPos < length + 1)
+    {
+        pos = str.find_first_of(delimiters, lastPos);
+        if (pos == std::wstring::npos)
+            pos = length;
+
+        if (pos != lastPos || !trimEmpty)
+            tokens.push_back(value_type(str.data() + lastPos, (size_type)pos - lastPos));
+
+        lastPos = pos + 1;
     }
 }
 
@@ -643,9 +661,9 @@ std::vector<std::wstring> FindMatchingSubs(const std::wstring& fileName)
                 std::transform(fn.begin(), fn.end(), fn.begin(), ::towlower);
                 if ((fn.find(L".ass", fn.find_last_of(L'.')) != std::wstring::npos) || (fn.find(L".srt", fn.find_last_of(L'.')) != std::wstring::npos))
                 {
-                    std::wstring tmp = fileName.substr(fileName.find_last_of(L'\\'));
-                    std::wstring ext = fn.substr(tmp.size() - 1);
-                    names.push_back(fileName + ext);
+                    std::wstring fp(fileName.substr(0, fileName.find_last_of(L'\\') + 1));
+                    fp.append(fd.cFileName);
+                    names.push_back(fp);
                 }
             }
         } while (FindNextFileW(hFind, &fd));

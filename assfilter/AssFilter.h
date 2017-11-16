@@ -88,6 +88,7 @@ public:
     STDMETHODIMP GetConsumerInfo(const WCHAR **pName, const WCHAR **pVersion) override;
 
     // IAFMExtSubtitles
+    STDMETHODIMP_(int) GetTotalExternalSubs();
     STDMETHODIMP_(int) GetCurExternalSub();
     STDMETHODIMP SetCurExternalSub(int iCurExtSub);
 

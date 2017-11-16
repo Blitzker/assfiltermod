@@ -46,7 +46,10 @@ HMENU CAssFilterTrayIcon::GetPopupMenu()
     int curExtSub = 0;
     IAFMExtSubtitles *pExtSubtitles = nullptr;
     if (SUCCEEDED(m_pFilter->QueryInterface(&pExtSubtitles)))
+    {
         curExtSub = pExtSubtitles->GetCurExternalSub();
+        pExtSubtitles->Release();
+    }
 
     for (auto i = 0; i < m_ExtSubFiles.size(); ++i)
     {
@@ -54,7 +57,12 @@ HMENU CAssFilterTrayIcon::GetPopupMenu()
         if (curExtSub == i)
             bChecked = TRUE;
 
-        std::wstring nameAndType(m_ExtSubFiles[i].subLang + L" (" + m_ExtSubFiles[i].subType + L")");
+        std::wstring nameAndType;
+        if (!m_ExtSubFiles[i].subAltName.empty())
+            nameAndType.assign(m_ExtSubFiles[i].subAltName + L" (" + m_ExtSubFiles[i].subType + L")");
+        else
+            nameAndType.assign(m_ExtSubFiles[i].subLang + L" (" + m_ExtSubFiles[i].subType + L")");
+
         menu.AddItem(STREAM_CMD_OFFSET + i, (LPWSTR)nameAndType.c_str(), bChecked);
 
         if (i == m_ExtSubFiles.size() - 1)
@@ -75,7 +83,10 @@ HRESULT CAssFilterTrayIcon::ProcessMenuCommand(HMENU hMenu, int cmd)
     {
         IAFMExtSubtitles *pExtSubtitles = nullptr;
         if (SUCCEEDED(m_pFilter->QueryInterface(&pExtSubtitles)))
+        {
             pExtSubtitles->SetCurExternalSub(cmd - STREAM_CMD_OFFSET);
+            pExtSubtitles->Release();
+        }
     }
     else if (cmd == STREAM_CMD_OFFSET - 1)
         OpenPropPage();

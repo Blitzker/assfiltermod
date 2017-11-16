@@ -82,7 +82,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 328
         TOPMARGIN, 7
-        BOTTOMMARGIN, 162
+        BOTTOMMARGIN, 202
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -223,11 +223,11 @@ BEGIN
     LTEXT           "www.iconarchive.com (system tray icon)",IDC_STATIC,7,103,160,8
 END
 
-IDD_PROPPAGE_GENERAL DIALOGEX 0, 0, 335, 169
+IDD_PROPPAGE_GENERAL DIALOGEX 0, 0, 335, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "General Settings",IDC_STATIC,7,7,313,129
+    GROUPBOX        "General Settings",IDC_STATIC,7,7,313,171
     CONTROL         "Disable Font Ligatures",IDC_FONT_LIGATURES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,20,87,10
     CONTROL         "Override Subtitles Resolution",IDC_NATIVE_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,24,66,109,10
     GROUPBOX        "Custom Subtitles Resolution",IDC_STATIC,14,50,298,37
@@ -236,7 +236,9 @@ BEGIN
     EDITTEXT        IDC_FONTS_FOLDER,24,105,279,14,ES_AUTOHSCROLL
     CONTROL         "Disable Auto-Load of External Subtitles",IDC_AUTO_LOAD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,34,141,10
-    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,142,84,14
+    PUSHBUTTON      "Reset Settings",IDC_BUTTONRESET,122,184,84,14
+    GROUPBOX        "External Subtitles Folders",IDC_STATIC,14,133,298,37
+    EDITTEXT        IDC_SUBS_FOLDER,24,147,279,14,ES_AUTOHSCROLL
 END
 
 
