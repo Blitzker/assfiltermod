@@ -99,9 +99,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <NASM>
-      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <IncludePaths>$(ProjectDir)upstream\libass;%(IncludePaths)</IncludePaths>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <PreprocessorDefinitions>PREFIX;WIN32=1;ARCH_X86_64=0;HAVE_ALIGNED_STACK=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PREFIX;ARCH_X86_64=0;HAVE_ALIGNED_STACK=0;HAVE_CPUNOP=0;private_prefix=ass;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </NASM>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,8 +117,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <NASM>
-      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
-      <PreprocessorDefinitions>WIN32=1;ARCH_X86_64=1;HAVE_ALIGNED_STACK=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)upstream\libass;%(IncludePaths)</IncludePaths>
+      <PreprocessorDefinitions>ARCH_X86_64=1;HAVE_ALIGNED_STACK=1;HAVE_CPUNOP=0;private_prefix=ass;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </NASM>
   </ItemDefinitionGroup>
@@ -139,7 +139,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <NASM>
-      <IncludePaths>$(ProjectDir)\upstream\libass\x86;%(IncludePaths)</IncludePaths>
+      <IncludePaths>$(ProjectDir)upstream\libass;%(IncludePaths)</IncludePaths>
       <PreprocessorDefinitions>PREFIX;ARCH_X86_64=0;HAVE_ALIGNED_STACK=0;HAVE_CPUNOP=0;private_prefix=ass;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </NASM>
   </ItemDefinitionGroup>
