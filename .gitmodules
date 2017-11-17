@@ -1,12 +1,12 @@
-[submodule "SMP/fribidi"]
-	path = SMP/fribidi
-	url = https://github.com/Blitzker/fribidi.git
-[submodule "SMP/freetype2"]
-	path = SMP/freetype2
-	url = https://github.com/Blitzker/freetype2.git
-[submodule "libass/upstream"]
+[submodule "libass"]
 	path = libass/upstream
 	url = https://github.com/Blitzker/libass.git
-[submodule "SMP/harfbuzz"]
+[submodule "fribidi"]
+	path = SMP/fribidi
+	url = https://github.com/Blitzker/fribidi.git
+[submodule "freetype2"]
+	path = SMP/freetype2
+	url = https://github.com/Blitzker/freetype2.git
+[submodule "harfbuzz"]
 	path = SMP/harfbuzz
 	url = https://github.com/Blitzker/harfbuzz.git

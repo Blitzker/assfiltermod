@@ -16,9 +16,16 @@ AssFilterMod is a version of AssFilter with new features and bug fixes:
 * Use latest versions of libraries
 * Auto-loading of external subtitles
 
-The SRT subtitles can be configured via the Settings tab.
+General Settings:
 
-![img](http://i.imgur.com/PM5Kl5n.png)
+![img](https://i.imgur.com/VjPng7m.png)
+
+Multiple folders need to be seperated by using the delimiter `;` in the External Subtitles Folders.
+**Note: Only subfolders of the currently playing media file folder can be used.**
+
+SRT Settings:
+
+![img](https://i.imgur.com/uL7vLCE.png)
 
 In the Custom Tags edit control, you can enter [Ass Tags](http://docs.aegisub.org/3.1/ASS_Tags/) and customize your SRT subtitles the way you want.
 
@@ -30,8 +37,10 @@ Ex: If you want your subtitles to be **BOLD**, enter `{\b1}`.
 * Only ASS and SRT subtitles are supported.
 
 ### Requirements
-* [Visual Studio 2015 Update 3 Redistribuables](https://www.microsoft.com/en-us/download/details.aspx?id=53840)
-* [DirectX 9 Redistribuables](https://www.microsoft.com/en-ca/download/details.aspx?id=8109)
+* [Visual Studio 2015 Update 3 Redistributables](https://www.microsoft.com/en-us/download/details.aspx?id=53840)
+* [Visual Studio 2017 Redistributables x32](https://go.microsoft.com/fwlink/?LinkId=746571)
+* [Visual Studio 2017 Redistributables x64](https://go.microsoft.com/fwlink/?LinkId=746572)
+* [DirectX 9 Redistributables](https://www.microsoft.com/en-ca/download/details.aspx?id=8109)
 
 Windows Vista, 7, 8, 8.1 and 10 (32 and 64 bits)
 
@@ -41,7 +50,7 @@ Can be found here https://github.com/Blitzker/assfiltermod/releases
 ### Compilation
 Compiling AssFilterMod is pretty straightforward:
 
-* Have `Visual Studio Community 2015 Update 3` installed.
+* Have `Visual Studio 2015 Update 3 or Visual Studio 2017` installed.
 * Check out `master` branch of assfiltermod.
 * Ensure that all submodules are up-to-date by running `git submodule update --init --recursive` from inside the tree.
 * Open `assfiltermod.sln` solution file and build.
@@ -51,6 +60,7 @@ Compiling AssFilterMod is pretty straightforward:
 * [DirectShow Base Classes](https://msdn.microsoft.com/en-us/library/windows/desktop/dd375456%28v=vs.85%29.aspx)
 * [FreeType](https://www.freetype.org/)
 * [FriBidi](https://www.fribidi.org/)
+* [HarfBuzz](https://www.freedesktop.org/wiki/Software/HarfBuzz/)
 * [libass](https://github.com/libass/libass)
 
 ### Credits
