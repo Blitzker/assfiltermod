@@ -236,6 +236,7 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
                     "ScriptType: v4.00+\n"
                     "WrapStyle: 0\n"
                     "ScaledBorderAndShadow: %s\n"
+                    "Kerning: %s\n"
                     "YCbCr Matrix: TV.709\n"
                     "PlayResX: %u\n"
                     "PlayResY: %u\n"
@@ -246,7 +247,8 @@ void AssFilter::Receive(IMediaSample* pSample, REFERENCE_TIME tSegmentStart)
                     "Style: Default,%s,%u,&H%X,&H%X,&H%X,&H%X,0,0,0,0,%u,%u,%u,0,1,%u,%u,%u,%u,%u,%u,1"
                     "\n\n[Events]\n"
                     "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n\n",
-                    m_settings.ScaledBorderAndShadow ? "yes" : "no", m_settings.SrtResX, m_settings.SrtResY,
+                    m_settings.ScaledBorderAndShadow ? "yes" : "no", m_settings.Kerning ? "yes" : "no",
+                    m_settings.SrtResX, m_settings.SrtResY,
                     ws2s(m_settings.FontName).c_str(), (int)std::round(m_settings.FontSize * resy), m_settings.ColorPrimary,
                     m_settings.ColorSecondary, m_settings.ColorOutline, m_settings.ColorShadow, 
                     m_settings.FontScaleX, m_settings.FontScaleY, m_settings.FontSpacing, m_settings.FontOutline, 
@@ -763,6 +765,7 @@ HRESULT AssFilter::LoadDefaults()
     m_settings.ScaledBorderAndShadow = TRUE;
     m_settings.DisableFontLigatures = FALSE;
     m_settings.DisableAutoLoad = FALSE;
+    m_settings.Kerning = FALSE;
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 18;
@@ -816,6 +819,9 @@ HRESULT AssFilter::ReadSettings(HKEY rootKey)
 
         bFlag = reg.ReadBOOL(L"DisableAutoLoad", hr);
         if (SUCCEEDED(hr)) m_settings.DisableAutoLoad = bFlag;
+
+        bFlag = reg.ReadBOOL(L"Kerning", hr);
+        if (SUCCEEDED(hr)) m_settings.Kerning = bFlag;
 
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
@@ -909,6 +915,7 @@ HRESULT AssFilter::SaveSettings()
         reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
         reg.WriteBOOL(L"DisableFontLigatures", m_settings.DisableFontLigatures);
         reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
+        reg.WriteBOOL(L"Kerning", m_settings.Kerning);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);

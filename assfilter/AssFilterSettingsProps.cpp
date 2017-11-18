@@ -172,6 +172,7 @@ HRESULT CAssFilterSettingsProp::OnActivate(void)
         SendDlgItemMessage(m_Dlg, IDC_SRT_RES_Y, WM_SETTEXT, 0, (LPARAM)stringBuffer);
 
         SendDlgItemMessage(m_Dlg, IDC_BORDER_SHADOW, BM_SETCHECK, m_settings.ScaledBorderAndShadow, 0);
+        SendDlgItemMessage(m_Dlg, IDC_KERNING, BM_SETCHECK, m_settings.Kerning, 0);
 
         SendDlgItemMessage(m_Dlg, IDC_CUSTOM_TAGS, WM_SETTEXT, 0, (LPARAM)m_settings.CustomTags.c_str());
     }
@@ -310,6 +311,7 @@ HRESULT CAssFilterSettingsProp::OnApplyChanges(void)
     m_settings.SrtResY = (DWORD)iBuffer;
 
     m_settings.ScaledBorderAndShadow = (BOOL)SendDlgItemMessage(m_Dlg, IDC_BORDER_SHADOW, BM_GETCHECK, 0, 0);
+    m_settings.Kerning = (BOOL)SendDlgItemMessage(m_Dlg, IDC_KERNING, BM_GETCHECK, 0, 0);
 
     WCHAR wsCustomBuffer[1024];
     SendDlgItemMessage(m_Dlg, IDC_CUSTOM_TAGS, WM_GETTEXT, 1024, (LPARAM)&wsCustomBuffer);
@@ -330,6 +332,9 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
     {
         bFlag = reg.ReadBOOL(L"ScaledBorderAndShadow", hr);
         if (SUCCEEDED(hr)) m_settings.ScaledBorderAndShadow = bFlag;
+
+        bFlag = reg.ReadBOOL(L"Kerning", hr);
+        if (SUCCEEDED(hr)) m_settings.Kerning = bFlag;
 
         strVal = reg.ReadString(L"FontName", hr);
         if (SUCCEEDED(hr)) m_settings.FontName = strVal;
@@ -395,6 +400,7 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
 HRESULT CAssFilterSettingsProp::LoadDefaults()
 {
     m_settings.ScaledBorderAndShadow = TRUE;
+    m_settings.Kerning = FALSE;
 
     m_settings.FontName = L"Arial";
     m_settings.FontSize = 18;
@@ -472,6 +478,7 @@ HRESULT CAssFilterSettingsProp::LoadDefaults()
     SendDlgItemMessage(m_Dlg, IDC_CUSTOM_TAGS, WM_SETTEXT, 0, (LPARAM)m_settings.CustomTags.c_str());
 
     SendDlgItemMessage(m_Dlg, IDC_BORDER_SHADOW, BM_SETCHECK, m_settings.ScaledBorderAndShadow, 0);
+    SendDlgItemMessage(m_Dlg, IDC_KERNING, BM_SETCHECK, m_settings.Kerning, 0);
 
     return S_OK;
 }
@@ -484,6 +491,7 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
     if (SUCCEEDED(hr))
     {
         reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
+        reg.WriteBOOL(L"Kerning", m_settings.Kerning);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
         reg.WriteDWORD(L"FontScaleX", m_settings.FontScaleX);
@@ -540,7 +548,11 @@ INT_PTR CAssFilterSettingsProp::OnReceiveMessage(HWND hwnd,
         {
             SetDirty();
         }
-        if (LOWORD(wParam) == IDC_FONT_NAME)
+        else if (LOWORD(wParam) == IDC_KERNING && HIWORD(wParam) == BN_CLICKED)
+        {
+            SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_FONT_NAME)
         {
             CHOOSEFONT cf {};
             LOGFONT lf {};

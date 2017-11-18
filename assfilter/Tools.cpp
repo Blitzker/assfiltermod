@@ -564,6 +564,7 @@ ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const 
         "ScriptType: v4.00+\n"
         "WrapStyle: 0\n"
         "ScaledBorderAndShadow: %s\n"
+        "Kerning: %s\n"
         "YCbCr Matrix: TV.709\n"
         "PlayResX: %u\n"
         "PlayResY: %u\n"
@@ -574,7 +575,8 @@ ASS_Track* srt_read_file(ASS_Library* library, const std::wstring& fname, const 
         "Style: Default,%s,%u,&H%X,&H%X,&H%X,&H%X,0,0,0,0,%u,%u,%u,0,1,%u,%u,%u,%u,%u,%u,1"
         "\n\n[Events]\n"
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n\n",
-        settings.ScaledBorderAndShadow ? "yes" : "no", settings.SrtResX, settings.SrtResY,
+        settings.ScaledBorderAndShadow ? "yes" : "no", settings.Kerning ? "yes" : "no",
+        settings.SrtResX, settings.SrtResY,
         ws2s(settings.FontName).c_str(), (int)std::round(settings.FontSize * resy), settings.ColorPrimary,
         settings.ColorSecondary, settings.ColorOutline, settings.ColorShadow,
         settings.FontScaleX, settings.FontScaleY, settings.FontSpacing, settings.FontOutline,

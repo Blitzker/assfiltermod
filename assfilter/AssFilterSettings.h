@@ -27,6 +27,7 @@ struct AssFSettings
     BOOL ScaledBorderAndShadow;
     BOOL DisableFontLigatures;
     BOOL DisableAutoLoad;
+    BOOL Kerning;
     DWORD FontSize;
     DWORD FontScaleX;
     DWORD FontScaleY;
