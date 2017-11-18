@@ -328,9 +328,6 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr, TRUE);
     if (SUCCEEDED(hr))
     {
-        bFlag = reg.ReadBOOL(L"TrayIcon", hr);
-        if (SUCCEEDED(hr)) m_settings.TrayIcon = bFlag;
-
         bFlag = reg.ReadBOOL(L"ScaledBorderAndShadow", hr);
         if (SUCCEEDED(hr)) m_settings.ScaledBorderAndShadow = bFlag;
 
@@ -397,7 +394,6 @@ HRESULT CAssFilterSettingsProp::LoadSettings()
 
 HRESULT CAssFilterSettingsProp::LoadDefaults()
 {
-    m_settings.TrayIcon = FALSE;
     m_settings.ScaledBorderAndShadow = TRUE;
 
     m_settings.FontName = L"Arial";
@@ -487,7 +483,6 @@ HRESULT CAssFilterSettingsProp::SaveSettings()
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr);
     if (SUCCEEDED(hr))
     {
-        reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
         reg.WriteBOOL(L"ScaledBorderAndShadow", m_settings.ScaledBorderAndShadow);
         reg.WriteString(L"FontName", m_settings.FontName.c_str());
         reg.WriteDWORD(L"FontSize", m_settings.FontSize);
@@ -1276,6 +1271,7 @@ HRESULT CAssFilterGeneralProp::OnActivate(void)
     hr = LoadSettings();
     if (SUCCEEDED(hr))
     {
+        SendDlgItemMessage(m_Dlg, IDC_TRAY_ICON, BM_SETCHECK, m_settings.TrayIcon, 0);
         SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.DisableFontLigatures, 0);
         SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_SETCHECK, m_settings.DisableAutoLoad, 0);
         SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_SETCHECK, m_settings.NativeSize, 0);
@@ -1302,6 +1298,7 @@ HRESULT CAssFilterGeneralProp::OnApplyChanges(void)
     HRESULT hr = S_OK;
 
     // Sanity check before saving the settings
+    m_settings.TrayIcon = (BOOL)SendDlgItemMessage(m_Dlg, IDC_TRAY_ICON, BM_GETCHECK, 0, 0);
     m_settings.DisableFontLigatures = (BOOL)SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_GETCHECK, 0, 0);
     m_settings.DisableAutoLoad = (BOOL)SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_GETCHECK, 0, 0);
     m_settings.NativeSize = (BOOL)SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_GETCHECK, 0, 0);
@@ -1328,6 +1325,9 @@ HRESULT CAssFilterGeneralProp::LoadSettings()
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr, TRUE);
     if (SUCCEEDED(hr))
     {
+        bFlag = reg.ReadBOOL(L"TrayIcon", hr);
+        if (SUCCEEDED(hr)) m_settings.TrayIcon = bFlag;
+
         bFlag = reg.ReadBOOL(L"NativeSize", hr);
         if (SUCCEEDED(hr)) m_settings.NativeSize = bFlag;
 
@@ -1352,6 +1352,7 @@ HRESULT CAssFilterGeneralProp::LoadSettings()
 
 HRESULT CAssFilterGeneralProp::LoadDefaults()
 {
+    m_settings.TrayIcon = FALSE;
     m_settings.NativeSize = FALSE;
     m_settings.DisableFontLigatures = FALSE;
     m_settings.DisableAutoLoad = FALSE;
@@ -1360,6 +1361,7 @@ HRESULT CAssFilterGeneralProp::LoadDefaults()
     m_settings.ExtraFontsDir = L"{FILE_DIR}";
     m_settings.ExtraSubsDir = L"Subs";
 
+    SendDlgItemMessage(m_Dlg, IDC_TRAY_ICON, BM_SETCHECK, m_settings.TrayIcon, 0);
     SendDlgItemMessage(m_Dlg, IDC_FONT_LIGATURES, BM_SETCHECK, m_settings.DisableFontLigatures, 0);
     SendDlgItemMessage(m_Dlg, IDC_NATIVE_SIZE, BM_SETCHECK, m_settings.NativeSize, 0);
     SendDlgItemMessage(m_Dlg, IDC_AUTO_LOAD, BM_SETCHECK, m_settings.DisableAutoLoad, 0);
@@ -1380,6 +1382,7 @@ HRESULT CAssFilterGeneralProp::SaveSettings()
     CRegistry reg = CRegistry(HKEY_CURRENT_USER, ASSFILTER_REGISTRY_KEY, hr);
     if (SUCCEEDED(hr))
     {
+        reg.WriteBOOL(L"TrayIcon", m_settings.TrayIcon);
         reg.WriteBOOL(L"NativeSize", m_settings.NativeSize);
         reg.WriteBOOL(L"DisableFontLigatures", m_settings.DisableFontLigatures);
         reg.WriteBOOL(L"DisableAutoLoad", m_settings.DisableAutoLoad);
@@ -1402,6 +1405,10 @@ INT_PTR CAssFilterGeneralProp::OnReceiveMessage(HWND hwnd,
             SetDirty();
         }
         else if (LOWORD(wParam) == IDC_AUTO_LOAD && HIWORD(wParam) == BN_CLICKED)
+        {
+            SetDirty();
+        }
+        else if (LOWORD(wParam) == IDC_TRAY_ICON && HIWORD(wParam) == BN_CLICKED)
         {
             SetDirty();
         }
